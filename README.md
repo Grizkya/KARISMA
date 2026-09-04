@@ -25,3 +25,11 @@ Terdapat informasi dari pengajuan dan status peminjamannya. Pemantauan status pe
   * 🔵 Proses Review — Berkas sedang ditinjau oleh pihak pengelola gedung.
   * 🟢 Disetujui (Approved) — Pengajuan diizinkan dan jadwal resmi terkunci.
   * 🔴 Ditolak (Rejected) / Revisi — Pengajuan ditolak atau memerlukan perbaikan berkas.
+
+## ✅ 5. Approval Management
+
+Halaman yang hanya digunakan oleh Admin untuk mengelola pengajuan peminjaman, melihat seluruh pengajuan, dan dapat menyetujui atau menolak pengajuan yang diberikan user
+
+---
+
+✨ KARISMA ✨
