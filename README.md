@@ -1,6 +1,6 @@
 # 🏛️ RaVenue — Unram Venue Reservation
 
-*RaVenue* adalah platform berbasis web yang menggunakan next.js yang dirancang untuk mempermudah proses peminjaman gedung kampus di *Universitas Mataram (Unram)*.
+*RaVenue* adalah platform berbasis web yang menggunakan next.js yang dirancang untuk mempermudah proses peminjaman gedung kampus di Universitas Mataram (Unram).
 
 ---
 
@@ -17,3 +17,11 @@ Memberikan penjelasan singkat terkait website RaVenue, informasi singkat terkait
 ## 📝 3. Booking
 
 User dapat mengajukan peminjaman gedung dengan mengisi formulir, seperti acara kegiatan, deskripsi kegiatan, pilihan fasilitas, tanggal peminjaman, Waktu mulai dan selesai, dan upload deskripsi kegiatan.
+
+## 📋 4. Status Peminjaman
+
+Terdapat informasi dari pengajuan dan status peminjamannya. Pemantauan status peminjaman secara transparan menggunakan indikator visual:
+  * 🟡 Menunggu Verifikasi — Berkas berhasil diunggah dan mengantre di sistem.
+  * 🔵 Proses Review — Berkas sedang ditinjau oleh pihak pengelola gedung.
+  * 🟢 Disetujui (Approved) — Pengajuan diizinkan dan jadwal resmi terkunci.
+  * 🔴 Ditolak (Rejected) / Revisi — Pengajuan ditolak atau memerlukan perbaikan berkas.
