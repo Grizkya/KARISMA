@@ -25,9 +25,9 @@ export default function Header() {
             Booking
           </Link>
           <Link 
-            href="/booking"
+            href="/management"
             className="text-[1.1em] font-medium text-[#eee] transition-colors duration-300 ease-in-out hover:text-[#F49D0A]">
-            Booking
+            Management
           </Link>
         </div>
       </nav>
