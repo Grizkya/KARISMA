@@ -145,7 +145,7 @@ function CalendarWidget() {
         </h2>
 
         <div className="flex bg-blue-600 rounded-lg p-1 shadow-sm">
-          {["Bulan", "Minggu", "Hari", "Agenda"].map((tab) => (
+          {["Bulan", "Agenda"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -180,71 +180,6 @@ function CalendarWidget() {
           </div>
         </div>
       )}
-
-      {activeTab === "Minggu" && (
-        <div className="border border-gray-200 rounded-xl overflow-x-auto bg-white shadow-sm">
-          <div className="min-w-175">
-            <div className="grid grid-cols-8 bg-gray-50 border-b border-gray-200 text-center text-xs font-bold text-gray-700 py-2">
-              <div className="border-r border-gray-200"></div>
-              {weekDays.map((d, i) => {
-                const dayNames = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
-                const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                const isToday = dateStr === todayStr;
-                return (
-                  <div key={i} className="border-r border-gray-200 last:border-r-0 py-1">
-                    <span className={isToday ? "bg-blue-600 text-white px-2 py-0.5 rounded" : ""}>
-                      {dayNames[i]} {d.getDate()}/{d.getMonth() + 1}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="grid grid-cols-8 border-b border-gray-200 text-xs text-gray-500 py-2">
-              <div className="text-center font-medium border-r border-gray-200 pr-2 self-center">Sehari penuh</div>
-              {Array.from({ length: 7 }).map((_, i) => (
-                <div key={i} className="border-r border-gray-200 last:border-r-0 min-h-7.5"></div>
-              ))}
-            </div>
-
-            {hours.map((hour) => (
-              <div key={hour} className="grid grid-cols-8 border-b border-gray-100 text-xs text-gray-600">
-                <div className="text-center py-3 border-r border-gray-200 font-mono text-gray-500 bg-gray-50/50">{hour}</div>
-                {weekDays.map((d, i) => {
-                  const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                  const isTodayCol = dateStr === todayStr;
-                  return (
-                    <div key={i} className={`border-r border-gray-200 last:border-r-0 min-h-11.25 ${isTodayCol ? "bg-yellow-50/40" : ""}`}></div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {activeTab === "Hari" && (
-        <div className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
-          <div>
-            <div className="bg-gray-50 border-b border-gray-200 text-center text-xs font-bold text-gray-700 py-2.5">
-              {daysNameLong[currentDate.getDay()]}
-            </div>
-
-            <div className="grid grid-cols-12 border-b border-gray-200 text-xs text-gray-500 py-2">
-              <div className="col-span-2 text-center font-medium border-r border-gray-200 pr-2 self-center">Sehari penuh</div>
-              <div className="col-span-10 min-h-7.5"></div>
-            </div>
-
-            {hours.map((hour) => (
-              <div key={hour} className="grid grid-cols-12 border-b border-gray-100 text-xs text-gray-600">
-                <div className="col-span-2 text-center py-3 border-r border-gray-200 font-mono text-gray-500 bg-gray-50/50">{hour}</div>
-                <div className="col-span-10 min-h-11.25 bg-yellow-50/40"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {activeTab === "Agenda" && (
         <div className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
           <div className="p-12 text-center text-gray-400 bg-gray-50/50 flex flex-col items-center justify-center space-y-2">
