@@ -23,7 +23,6 @@ export default function BookingPage() {
   const [showStartTimeDropdown, setShowStartTimeDropdown] = useState(false);
   const [showEndTimeDropdown, setShowEndTimeDropdown] = useState(false);
   
-  // Refs untuk navigasi otomatis ke elemen yang belum diisi
   const picNameRef = useRef(null);
   const picIdentityRef = useRef(null);
   const whatsappRef = useRef(null);
@@ -38,7 +37,7 @@ export default function BookingPage() {
 
   const timeOptions = [
     "06:00", "07:00", "08:00", "09:00", "10:00", 
-    "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"
+    "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00",
   ];
 
   useEffect(() => {
@@ -65,7 +64,6 @@ export default function BookingPage() {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validasi satu per satu agar bisa diarahkan ke elemen yang kosong
     if (!formData.pic_name) {
       setMessage({ text: "⚠️ Mohon isi Nama Penanggung Jawab terlebih dahulu.", type: "error" });
       picNameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -125,16 +123,31 @@ export default function BookingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-6 px-4 flex flex-col justify-center">
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link href="https://fonts.googleapis.com/css2?family=Arvo:ital,wght@0,400;0,700;1,400;1,700&family=Crimson+Pro:ital,wght@0,700;1,700&family=Lobster&family=PT+Serif:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
+
       <div className="max-w-3xl mx-auto w-full bg-white rounded-xl shadow-md border border-gray-100 p-6 md:p-8">
         
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-extrabold text-gray-900 flex items-center justify-center gap-2">
-            <span>Pengajuan Reservasi Gedung</span>
-            <span className="text-[#fca311]">UNRAM</span>
+          <h1 className="text-2xl font-extrabold text-gray-900 flex items-baseline justify-center gap-2 flex-wrap">
+            <span style={{ fontFamily: "'Arvo', serif" }}>Pengajuan Reservasi Gedung</span>
+            <span 
+              className="text-[#fca311]" 
+              style={{ 
+                fontFamily: "'Lobster', cursive", 
+                fontSize: "1.6rem", 
+                display: "inline-block",
+                lineHeight: "1",
+                transform: "translateY(3px)"
+              }}
+            >
+              UNRAM
+            </span>
           </h1>
           <p className="text-xs text-gray-500 mt-1 max-w-xl mx-auto">
-            Lengkapi instrumen peminjaman fasilitas sarana dan prasarana umum secara valid.
+            Lengkapi instrumen peminjaman fasilitas secara valid.
           </p>
         </div>
 
@@ -151,7 +164,7 @@ export default function BookingPage() {
           {/* Bagian 1 */}
           <div id="step-section-1" className="space-y-3">
             <div className="flex justify-between items-center pb-1 border-b border-gray-100">
-              <h3 className="text-sm font-bold text-gray-900">
+              <h3 className="text-sm text-gray-900" style={{ fontFamily: "'PT Serif', serif", fontWeight: 700 }}>
                 1. Identitas Penanggung Jawab
               </h3>
             </div>
@@ -207,13 +220,19 @@ export default function BookingPage() {
           {/* Bagian 2 */}
           <div id="step-section-2" className="space-y-3 pt-4">
             <div className="flex justify-between items-center pb-1 border-b border-gray-100">
-              <h3 className="text-sm font-bold text-gray-900">2. Detail Kegiatan & Jadwal Venue</h3>
+              <h3 className="text-sm text-gray-900" style={{ fontFamily: "'PT Serif', serif", fontWeight: 700 }}>
+                2. Detail Kegiatan & Jadwal Venue
+              </h3>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-bold uppercase text-gray-700 mb-1">
-                  NAMA KEGIATAN <span className="text-orange-500 font-normal">(EVENT_NAME)</span> <span className="text-red-500">*</span>
+                  NAMA KEGIATAN{" "}
+                  <span className="text-orange-500 text-[11px]" style={{ fontFamily: "'Crimson Pro', serif", fontWeight: 700 }}>
+                    (EVENT_NAME)
+                  </span>{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   ref={eventNameRef}
@@ -228,7 +247,11 @@ export default function BookingPage() {
 
               <div>
                 <label className="block text-[11px] font-bold uppercase text-gray-700 mb-1">
-                  PILIH VENUE <span className="text-orange-500 font-normal">(VENUE_ID)</span> <span className="text-red-500">*</span>
+                  PILIH VENUE{" "}
+                  <span className="text-orange-500 text-[11px]" style={{ fontFamily: "'Crimson Pro', serif", fontWeight: 700 }}>
+                    (VENUE_ID)
+                  </span>{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="venue_id"
@@ -246,7 +269,11 @@ export default function BookingPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <label className="block text-[11px] font-bold uppercase text-gray-700 mb-1">
-                  TANGGAL <span className="text-orange-500 font-normal">(DATE)</span> <span className="text-red-500">*</span>
+                  TANGGAL{" "}
+                  <span className="text-orange-500 text-[11px]" style={{ fontFamily: "'Crimson Pro', serif", fontWeight: 700 }}>
+                    (DATE)
+                  </span>{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   ref={dateRef}
@@ -260,7 +287,11 @@ export default function BookingPage() {
 
               <div className="relative" ref={startRef}>
                 <label className="block text-[11px] font-bold uppercase text-gray-700 mb-1">
-                  JAM MULAI <span className="text-orange-500 font-normal">(START_TIME)</span> <span className="text-red-500">*</span>
+                  JAM MULAI{" "}
+                  <span className="text-orange-500 text-[11px]" style={{ fontFamily: "'Crimson Pro', serif", fontWeight: 700 }}>
+                    (START_TIME)
+                  </span>{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <div onClick={() => setShowStartTimeDropdown(!showStartTimeDropdown)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-xs text-gray-800 flex justify-between items-center cursor-pointer shadow-sm">
                   <span>{formData.start_time}</span>
@@ -278,8 +309,12 @@ export default function BookingPage() {
               </div>
 
               <div className="relative" ref={endRef}>
-                <label className="block text-[11px] font-bold uppercase text-gray-700 mb-1">
-                  JAM SELESAI <span className="text-orange-500 font-normal">(END_TIME)</span> <span className="text-red-500">*</span>
+                <label className="block text-[11px] font-bold text-gray-700 mb-1">
+                  JAM SELESAI{" "}
+                  <span className="text-orange-500 text-[11px]" style={{ fontFamily: "'Crimson Pro', serif", fontWeight: 700 }}>
+                    (END_TIME)
+                  </span>{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <div onClick={() => setShowEndTimeDropdown(!showEndTimeDropdown)} className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-xs text-gray-800 flex justify-between items-center cursor-pointer shadow-sm">
                   <span>{formData.end_time}</span>
@@ -299,7 +334,11 @@ export default function BookingPage() {
 
             <div>
               <label className="block text-[11px] font-bold uppercase text-gray-700 mb-1">
-                JUMLAH PESERTA <span className="text-orange-500 font-normal">(PARTICIPANT_COUNT)</span> <span className="text-red-500">*</span>
+                JUMLAH PESERTA{" "}
+                <span className="text-orange-500 text-[11px]" style={{ fontFamily: "'Crimson Pro', serif", fontWeight: 700 }}>
+                  (PARTICIPANT_COUNT)
+                </span>{" "}
+                <span className="text-red-500">*</span>
               </label>
               <input
                 ref={participantCountRef}
@@ -331,7 +370,9 @@ export default function BookingPage() {
           {/* Bagian 3 */}
           <div id="step-section-3" className="space-y-3 pt-4" ref={signatureRef}>
             <div className="flex justify-between items-center pb-1 border-b border-gray-100">
-              <h3 className="text-sm font-bold text-gray-900">3. Unggah Tanda Tangan</h3>
+              <h3 className="text-sm text-gray-900" style={{ fontFamily: "'PT Serif', serif", fontWeight: 700 }}>
+                3. Unggah Tanda Tangan
+              </h3>
             </div>
             
             <div>
