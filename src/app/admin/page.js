@@ -9,7 +9,7 @@ export default function AdminDashboard() {
         </h1>
 
         <p className="mt-2 text-gray-500">
-          Ringkasan aktivitas KARISMA
+          Memantau pembaruan RaVenue
         </p>
       </div>
 

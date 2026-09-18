@@ -59,7 +59,7 @@ export default function Management() {
                 </p>
 
                 <p className="text-xs text-gray-500">
-                  Admin KARISMA
+                  Admin RaVenue
                 </p>
               </div>
             </div>
