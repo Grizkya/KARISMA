@@ -232,8 +232,7 @@ export default function StatusBookingPage() {
 
             <a
               href="/"
-              className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
-            >
+              className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700">
               + Ajukan Peminjaman Baru
             </a>
 

@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import About from "@/components/About";
+import Calendar from "@/components/Calendar";
 import Guide from "@/components/Guide";
 
 function Header() {
@@ -17,6 +18,7 @@ export default function Home() {
     <div>
       <Header />
       <About />
+      <Calendar />
       <Guide />
     </div>
   );
