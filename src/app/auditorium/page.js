@@ -48,12 +48,6 @@ export default function AuditoriumPage() {
         </div>
 
         <div className="mt-8 pt-6 border-t border-gray-100 flex justify-end">
-          <Link 
-            href="/booking" 
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition shadow-sm inline-flex items-center gap-2"
-          >
-            Ajukan Peminjaman Gedung Ini &rarr;
-          </Link>
         </div>
       </div>
     </main>
