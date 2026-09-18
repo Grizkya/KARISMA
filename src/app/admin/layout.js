@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
@@ -89,7 +90,7 @@ export default function AdminLayout({ children }) {
       <aside className="fixed left-0 top-0 z-40 flex h-screen w-64 flex-col bg-[#1D2B42] text-white">
         {/* LOGO */}
         <div className="flex h-28 items-center border-b border-white/10 px-6">
-          <img
+          <Image
             src="/ravenue_unram_logo.png"
             alt="RaVenue Universitas Mataram"
             className="h-16 w-auto object-contain"
@@ -299,7 +300,7 @@ export default function AdminLayout({ children }) {
           LOGOUT MODAL
       ========================= */}
       {showLogoutModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
             <div className="text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-2xl">

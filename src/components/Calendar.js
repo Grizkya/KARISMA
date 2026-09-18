@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import Image from "next/image";
 
 function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -124,7 +123,7 @@ function Calendar() {
                   {calendarDays.map((item, index) => {
                     const isToday = item.dateStr === todayStr;
                     return (
-                      <div key={index} className={`min-h-[55px] sm:min-h-[65px] border-b border-r border-gray-100 p-1.5 flex flex-col justify-between transition ${item.isCurrentMonth ? "bg-white" : "bg-slate-50/50"}`}>
+                      <div key={index} className={`min-h-13.75 sm:min-h-16.25 border-b border-r border-gray-100 p-1.5 flex flex-col justify-between transition ${item.isCurrentMonth ? "bg-white" : "bg-slate-50/50"}`}>
                         <div className="flex justify-end">
                           <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-md ${isToday ? "bg-[#F4B042] text-white shadow-sm" : item.isCurrentMonth ? "text-gray-800" : "text-gray-300"}`}>
                             {item.dayNum}
@@ -138,7 +137,7 @@ function Calendar() {
             )}
 
             {activeTab === "Agenda" && (
-              <div className="border border-gray-100 rounded-xl overflow-hidden bg-white shadow-sm p-8 text-center text-gray-400 bg-slate-50/50">
+              <div className="border border-gray-100 rounded-xl overflow-hidden bg-white shadow-sm p-8 text-center text-gray-400">
                 <span className="text-sm font-medium">Belum ada agenda pada bulan {monthsName[month]} {year}.</span>
               </div>
             )}
@@ -172,13 +171,8 @@ function Calendar() {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50 pb-12">
-      <div className="text-center p-10">
-      </div>
-      
-      <div className="px-4">
-        <Calendar />
-      </div>
+    <div>
+      <Calendar />
     </div>
   );
 }

@@ -1,6 +1,5 @@
-"use client";
-import Link from "next/link";
 import About from "@/components/About";
+import Gedung from "@/components/Gedung";
 import Calendar from "@/components/Calendar";
 import Guide from "@/components/Guide";
 
@@ -18,6 +17,7 @@ export default function Home() {
     <div>
       <Header />
       <About />
+      <Gedung />
       <Calendar />
       <Guide />
     </div>

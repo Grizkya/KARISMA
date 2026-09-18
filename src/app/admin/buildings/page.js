@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getBuildings } from "./actions";
+import Image from "next/image";
 
 export default function BuildingsPage() {
   const [search, setSearch] = useState("");
@@ -180,7 +181,7 @@ export default function BuildingsPage() {
 
         <div className="overflow-x-auto">
 
-          <table className="w-full min-w-[800px]">
+          <table className="w-full min-w-200">
 
             {/* TABLE HEADER */}
             <thead>
@@ -275,7 +276,7 @@ export default function BuildingsPage() {
 
                       {building?.foto ? (
 
-                        <img
+                        <Image
                           src={building.foto}
                           alt={
                             building?.nama ||
@@ -560,7 +561,7 @@ export default function BuildingsPage() {
             <div className="space-y-5 px-6 py-6">
 
               {selectedBuilding?.foto && (
-                <img
+                <Image
                   src={selectedBuilding.foto}
                   alt={
                     selectedBuilding?.nama ||
