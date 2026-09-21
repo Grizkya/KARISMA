@@ -19,7 +19,7 @@ export default function BookingPage() {
     signature_file: null,
   });
 
-  const [message, setMessage] = useState({ text: "", type: "" });
+  const [errors, setErrors] = useState({});
   const [showStartTimeDropdown, setShowStartTimeDropdown] = useState(false);
   const [showEndTimeDropdown, setShowEndTimeDropdown] = useState(false);
 
@@ -59,71 +59,62 @@ export default function BookingPage() {
       ...formData,
       [name]: files ? files[0] : value,
     });
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: "" });
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const newErrors = {};
 
     if (!formData.pic_name) {
-      setMessage({ text: "⚠️ Mohon isi Nama Penanggung Jawab terlebih dahulu.", type: "error" });
+      newErrors.pic_name = "⚠️ Mohon isi Nama Penanggung Jawab terlebih dahulu.";
       picNameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       picNameRef.current?.focus();
-      return;
-    }
-    if (!formData.pic_identity) {
-      setMessage({ text: "⚠️ Mohon isi NIM / NIP terlebih dahulu.", type: "error" });
+    } else if (!formData.pic_identity) {
+      newErrors.pic_identity = "⚠️ Mohon isi NIM / NIP terlebih dahulu.";
       picIdentityRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       picIdentityRef.current?.focus();
-      return;
-    }
-    if (!formData.whatsapp) {
-      setMessage({ text: "⚠️ Mohon isi Nomor WhatsApp Aktif terlebih dahulu.", type: "error" });
+    } else if (!formData.whatsapp) {
+      newErrors.whatsapp = "⚠️ Mohon isi Nomor WhatsApp Aktif terlebih dahulu.";
       whatsappRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       whatsappRef.current?.focus();
-      return;
-    }
-    if (!formData.event_name) {
-      setMessage({ text: "⚠️ Mohon isi Nama Kegiatan terlebih dahulu.", type: "error" });
+    } else if (!formData.event_name) {
+      newErrors.event_name = "⚠️ Mohon isi Nama Kegiatan terlebih dahulu.";
       eventNameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       eventNameRef.current?.focus();
-      return;
-    }
-    if (!formData.date) {
-      setMessage({ text: "⚠️ Mohon pilih Tanggal kegiatan terlebih dahulu.", type: "error" });
+    } else if (!formData.date) {
+      newErrors.date = "⚠️ Mohon pilih Tanggal kegiatan terlebih dahulu.";
       dateRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       dateRef.current?.focus();
-      return;
-    }
-    if (!formData.participant_count) {
-      setMessage({ text: "⚠️ Mohon isi Jumlah Peserta terlebih dahulu.", type: "error" });
+    } else if (!formData.participant_count) {
+      newErrors.participant_count = "⚠️ Mohon isi Jumlah Peserta terlebih dahulu.";
       participantCountRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       participantCountRef.current?.focus();
-      return;
-    }
-    if (!formData.purpose) {
-      setMessage({ text: "⚠️ Mohon isi Tujuan / Deskripsi Kegiatan terlebih dahulu.", type: "error" });
+    } else if (!formData.purpose) {
+      newErrors.purpose = "⚠️ Mohon isi Tujuan / Deskripsi Kegiatan terlebih dahulu.";
       purposeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       purposeRef.current?.focus();
-      return;
-    }
-    if (!formData.signature_file) {
-      setMessage({ text: "⚠️ Mohon unggah File Tanda Tangan terlebih dahulu.", type: "error" });
+    } else if (!formData.signature_file) {
+      newErrors.signature_file = "⚠️ Mohon unggah File Tanda Tangan terlebih dahulu.";
       signatureRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
       return;
     }
-    
 
     console.log("Data siap disimpan ke database:", formData);
-    setMessage({
-      text: "✅ Pengajuan reservasi berhasil dibuat!",
-      type: "success",
-    });
+    alert("✅ Pengajuan reservasi berhasil dibuat!");
   };
 
   return (
     <div className="bg-slate-50 min-h-screen py-16 px-6 relative">
       
-      {/* TOMBOL PANAH KEMBALI */}
+    
       <div className="max-w-3xl mx-auto mb-6">
         <Link 
           href="/" 
@@ -154,16 +145,6 @@ export default function BookingPage() {
 
         {/* Form Container */}
         <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-gray-100">
-          
-          {message.text && (
-            <div className={`mb-6 p-3 rounded-lg text-xs font-semibold text-center border ${
-              message.type === "error" 
-                ? "bg-red-50 border-red-200 text-red-600" 
-                : "bg-emerald-50 border-emerald-200 text-emerald-700"
-            }`}>
-              {message.text}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
             
@@ -177,9 +158,14 @@ export default function BookingPage() {
               
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                    Nama Penanggung Jawab <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                      Nama Penanggung Jawab <span className="text-red-500">*</span>
+                    </label>
+                    {errors.pic_name && (
+                      <span className="text-xs font-medium text-red-500/80 opacity-90">{errors.pic_name}</span>
+                    )}
+                  </div>
                   <input
                     ref={picNameRef}
                     type="text"
@@ -192,9 +178,14 @@ export default function BookingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                    NIM / NIP <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                      NIM / NIP <span className="text-red-500">*</span>
+                    </label>
+                    {errors.pic_identity && (
+                      <span className="text-xs font-medium text-red-500/80 opacity-90">{errors.pic_identity}</span>
+                    )}
+                  </div>
                   <input
                     ref={picIdentityRef}
                     type="text"
@@ -207,9 +198,14 @@ export default function BookingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                    Nomor WhatsApp Aktif <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                      Nomor WhatsApp Aktif <span className="text-red-500">*</span>
+                    </label>
+                    {errors.whatsapp && (
+                      <span className="text-xs font-medium text-red-500/80 opacity-90">{errors.whatsapp}</span>
+                    )}
+                  </div>
                   <input
                     ref={whatsappRef}
                     type="text"
@@ -233,9 +229,14 @@ export default function BookingPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                    Nama Kegiatan <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                      Nama Kegiatan <span className="text-red-500">*</span>
+                    </label>
+                    {errors.event_name && (
+                      <span className="text-xs font-medium text-red-500/80 opacity-90">{errors.event_name}</span>
+                    )}
+                  </div>
                   <input
                     ref={eventNameRef}
                     type="text"
@@ -266,9 +267,14 @@ export default function BookingPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                    Tanggal <span className="text-red-500">*</span>
-                  </label>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                      Tanggal <span className="text-red-500">*</span>
+                    </label>
+                    {errors.date && (
+                      <span className="text-xs font-medium text-red-500/80 opacity-90">{errors.date}</span>
+                    )}
+                  </div>
                   <input
                     ref={dateRef}
                     type="date"
@@ -333,9 +339,14 @@ export default function BookingPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                  Jumlah Peserta <span className="text-red-500">*</span>
-                </label>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                    Jumlah Peserta <span className="text-red-500">*</span>
+                  </label>
+                  {errors.participant_count && (
+                    <span className="text-xs font-medium text-red-500/80 opacity-90">{errors.participant_count}</span>
+                  )}
+                </div>
                 <input
                   ref={participantCountRef}
                   type="number"
@@ -348,9 +359,14 @@ export default function BookingPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                  Tujuan / Deskripsi Kegiatan <span className="text-red-500">*</span>
-                </label>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                    Tujuan / Deskripsi Kegiatan <span className="text-red-500">*</span>
+                  </label>
+                  {errors.purpose && (
+                    <span className="text-xs font-medium text-red-500/80 opacity-90">{errors.purpose}</span>
+                  )}
+                </div>
                 <textarea
                   ref={purposeRef}
                   name="purpose"
@@ -372,9 +388,14 @@ export default function BookingPage() {
               </div>
               
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                  File Tanda Tangan (PNG / JPG / PDF, Max 5MB) <span className="text-red-500">*</span>
-                </label>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
+                    File Tanda Tangan (PNG / JPG / PDF, Max 5MB) <span className="text-red-500">*</span>
+                  </label>
+                  {errors.signature_file && (
+                    <span className="text-xs font-medium text-red-500/80 opacity-90">{errors.signature_file}</span>
+                  )}
+                </div>
                 <div className="relative border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-blue-50/50 transition rounded-xl p-6 text-center cursor-pointer">
                   <input
                     type="file"
