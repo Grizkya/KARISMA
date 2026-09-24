@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
+import { apiFetch } from "@/lib/api";
 
 function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -105,20 +107,7 @@ function Calendar() {
                   return (
                     <div key={index} className={`min-h-[60px] sm:min-h-[75px] border-b border-r border-gray-100 p-2 flex flex-col justify-between transition ${item.isCurrentMonth ? "bg-white" : "bg-slate-50/50"}`}>
                       <div className="flex justify-between items-start">
-                        <div className="flex gap-1 items-center mt-0.5">
-                          {item.dateStr === `${year}-${String(month + 1).padStart(2, '0')}-22` && (
-                            <>
-                              <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" title="Audit"></span>
-                              <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" title="Dom"></span>
-                            </>
-                          )}
-                          {item.dateStr === `${year}-${String(month + 1).padStart(2, '0')}-24` && (
-                            <span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" title="Dom"></span>
-                          )}
-                          {item.dateStr === `${year}-${String(month + 1).padStart(2, '0')}-25` && (
-                            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block" title="Arena Budaya"></span>
-                          )}
-                        </div>
+                        <div className="flex gap-1 items-center mt-0.5"></div>
                         <span className={`text-xs sm:text-sm font-bold px-2 py-0.5 rounded-md ${isToday ? "bg-[#F4B042] text-white shadow-sm" : item.isCurrentMonth ? "text-gray-800" : "text-gray-300"}`}>
                           {item.dayNum}
                         </span>

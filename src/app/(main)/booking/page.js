@@ -108,16 +108,16 @@ export default function BookingPage() {
         signature_url: formData.signature_url || null,
       };
 
-      const result = await apiFetch("/ravenue/bookings", {
+      const result = await apiFetch("/bookings", {
         method: "POST",
         body: payload,
       });
 
       console.log("Response sukses:", result);
-      alert("✅ Berhasil! Pengajuan reservasi berhasil dikirim ke database.");
+      alert("Pengajuan reservasi berhasil!");
     } catch (error) {
       console.error("Error API:", error);
-      alert(`❌ Terjadi kesalahan: ${error.message}`);
+      alert(`Terjadi kesalahan: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -126,11 +126,11 @@ export default function BookingPage() {
   const selectedVenueName = venueOptions.find((v) => v.id === formData.venue_id)?.name || "Pilih Gedung";
 
   return (
-    <div className="bg-gradient-to-b from-[#f7faff] via-[#f0f7fd] to-[#eaf3fa] min-h-screen py-16 px-6 relative">
+    <div className="bg-white min-h-screen py-16 px-6 relative">
       <div className="max-w-3xl mx-auto mb-6">
         <Link 
           href="/" 
-          className="inline-flex items-center gap-2 text-[#133D86] hover:text-[#F49D0A] text-sm font-semibold transition-colors duration-200"
+          className="inline-flex items-center gap-2 text-[#133D86] hover:text-[#F4B042] text-sm font-semibold transition-colors duration-200"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -144,7 +144,7 @@ export default function BookingPage() {
           <span className="inline-block px-3.5 py-1.5 bg-amber-50 text-[#F49D0A] border border-amber-200/70 text-xs font-bold rounded-full uppercase tracking-wider shadow-xs">
             Form Reservasi RaVenue
           </span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#133D86] leading-tight tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-[#133D86] leading-tight">
             Pengajuan Reservasi Gedung
           </h1>
           <p className="text-gray-600 text-sm leading-relaxed">
@@ -152,16 +152,16 @@ export default function BookingPage() {
           </p>
         </div>
 
-        <div className="bg-[#edf6fd] rounded-2xl p-6 sm:p-10 shadow-lg shadow-blue-950/5 border border-sky-200/80">
+        <div className="bg-[#f5f9fd] rounded-2xl p-6 sm:p-10 shadow-lg shadow-blue-950/5 border border-blue-100/70">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             <div>
               <div className="flex justify-between items-center mb-1.5">
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
-                  Nama Kegiatan <span className="text-red-400/70">*</span>
+                  Nama Kegiatan <span className="text-red-400/60">*</span>
                 </label>
                 {errors.event_name && (
-                  <span className="text-xs font-normal text-red-400/75">{errors.event_name}</span>
+                  <span className="text-xs font-normal text-rose-400/80 [text-shadow:_0_0_1px_rgba(251,113,133,0.3)]">{errors.event_name}</span>
                 )}
               </div>
               <input
@@ -171,22 +171,22 @@ export default function BookingPage() {
                 value={formData.event_name}
                 onChange={handleChange}
                 placeholder="Contoh: Rapat Koordinasi"
-                className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#133D86]/20 focus:border-[#133D86] transition-all"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#133D86] transition"
               />
             </div>
 
             <div className="relative" ref={venueRef}>
               <div className="flex justify-between items-center mb-1.5">
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
-                  Gedung <span className="text-red-400/70">*</span>
+                  Gedung <span className="text-red-400/60">*</span>
                 </label>
                 {errors.venue_id && (
-                  <span className="text-xs font-normal text-red-400/75">{errors.venue_id}</span>
+                  <span className="text-xs font-normal text-rose-400/80 [text-shadow:_0_0_1px_rgba(251,113,133,0.3)]">{errors.venue_id}</span>
                 )}
               </div>
               <div 
                 onClick={() => setShowVenueDropdown(!showVenueDropdown)}
-                className="w-full bg-white border border-slate-300 hover:border-slate-400 rounded-xl px-4 py-2.5 text-sm text-gray-800 flex justify-between items-center cursor-pointer transition-colors"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 flex justify-between items-center cursor-pointer"
               >
                 <span className={formData.venue_id ? "text-gray-800 font-medium" : "text-gray-400"}>
                   {selectedVenueName}
@@ -194,7 +194,7 @@ export default function BookingPage() {
                 <span className="text-gray-400 text-xs">▼</span>
               </div>
               {showVenueDropdown && (
-                <div className="absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-xl max-h-48 overflow-y-auto py-1">
+                <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                   {venueOptions.map((venue) => (
                     <div 
                       key={venue.id} 
@@ -203,11 +203,7 @@ export default function BookingPage() {
                         setShowVenueDropdown(false); 
                         if (errors.venue_id) setErrors({ ...errors, venue_id: "" });
                       }} 
-                      className={`px-4 py-2.5 text-xs cursor-pointer font-medium border-b border-gray-50 last:border-none transition-colors ${
-                        formData.venue_id === venue.id
-                          ? "bg-sky-100/70 text-[#133D86] font-bold"
-                          : "text-gray-700 hover:bg-sky-50 hover:text-[#133D86]"
-                      }`}
+                      className="px-4 py-2.5 text-xs hover:bg-blue-50 cursor-pointer text-gray-700 border-b border-gray-50 last:border-none font-medium"
                     >
                       {venue.name}
                     </div>
@@ -226,7 +222,7 @@ export default function BookingPage() {
                 value={formData.purpose}
                 onChange={handleChange}
                 placeholder="Tuliskan tujuan atau deskripsi kegiatan..."
-                className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#133D86]/20 focus:border-[#133D86] transition-all"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#133D86] transition"
               ></textarea>
             </div>
 
@@ -234,10 +230,10 @@ export default function BookingPage() {
               <div>
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="block text-xs font-bold uppercase tracking-wider text-gray-700">
-                    Tanggal <span className="text-red-400/70">*</span>
+                    Tanggal <span className="text-red-400/60">*</span>
                   </label>
                   {errors.date && (
-                    <span className="text-xs font-normal text-red-400/75">{errors.date}</span>
+                    <span className="text-xs font-normal text-rose-400/80 [text-shadow:_0_0_1px_rgba(251,113,133,0.3)]">{errors.date}</span>
                   )}
                 </div>
                 <input
@@ -246,32 +242,28 @@ export default function BookingPage() {
                   name="date"
                   value={formData.date}
                   onChange={handleChange}
-                  className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#133D86]/20 focus:border-[#133D86] transition-all"
+                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#133D86] transition"
                 />
               </div>
 
               <div className="relative" ref={startRef}>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                  Jam Mulai <span className="text-red-400/70">*</span>
+                  Jam Mulai <span className="text-red-400/60">*</span>
                 </label>
                 <div 
                   onClick={() => setShowStartTimeDropdown(!showStartTimeDropdown)} 
-                  className="w-full bg-white border border-slate-300 hover:border-slate-400 rounded-xl px-4 py-2.5 text-sm text-gray-800 flex justify-between items-center cursor-pointer transition-colors"
+                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 flex justify-between items-center cursor-pointer"
                 >
-                  <span className="font-medium">{formData.start_time}</span>
+                  <span>{formData.start_time}</span>
                   <span className="text-gray-400 text-xs">▼</span>
                 </div>
                 {showStartTimeDropdown && (
-                  <div className="absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-xl max-h-40 overflow-y-auto py-1">
+                  <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
                     {timeOptions.map((time) => (
                       <div 
                         key={time} 
                         onClick={() => { setFormData({ ...formData, start_time: time }); setShowStartTimeDropdown(false); }} 
-                        className={`px-4 py-2 text-xs cursor-pointer font-medium transition-colors ${
-                          formData.start_time === time 
-                            ? "bg-sky-100/70 text-[#133D86] font-bold" 
-                            : "text-gray-700 hover:bg-sky-50 hover:text-[#133D86]"
-                        }`}
+                        className="px-4 py-2 text-xs hover:bg-blue-50 cursor-pointer text-gray-700"
                       >
                         {time}
                       </div>
@@ -282,26 +274,22 @@ export default function BookingPage() {
 
               <div className="relative" ref={endRef}>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                  Jam Selesai <span className="text-red-400/70">*</span>
+                  Jam Selesai <span className="text-red-400/60">*</span>
                 </label>
                 <div 
                   onClick={() => setShowEndTimeDropdown(!showEndTimeDropdown)} 
-                  className="w-full bg-white border border-slate-300 hover:border-slate-400 rounded-xl px-4 py-2.5 text-sm text-gray-800 flex justify-between items-center cursor-pointer transition-colors"
+                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 flex justify-between items-center cursor-pointer"
                 >
-                  <span className="font-medium">{formData.end_time}</span>
+                  <span>{formData.end_time}</span>
                   <span className="text-gray-400 text-xs">▼</span>
                 </div>
                 {showEndTimeDropdown && (
-                  <div className="absolute z-20 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-xl max-h-40 overflow-y-auto py-1">
+                  <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
                     {timeOptions.map((time) => (
                       <div 
                         key={time} 
                         onClick={() => { setFormData({ ...formData, end_time: time }); setShowEndTimeDropdown(false); }} 
-                        className={`px-4 py-2 text-xs cursor-pointer font-medium transition-colors ${
-                          formData.end_time === time 
-                            ? "bg-sky-100/70 text-[#133D86] font-bold" 
-                            : "text-gray-700 hover:bg-sky-50 hover:text-[#133D86]"
-                        }`}
+                        className="px-4 py-2 text-xs hover:bg-blue-50 cursor-pointer text-gray-700"
                       >
                         {time}
                       </div>
@@ -318,16 +306,22 @@ export default function BookingPage() {
               <input
                 type="number"
                 name="participant_count"
+                min="0"
                 value={formData.participant_count}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "" || Number(value) >= 0) {
+                    handleChange(e);
+                  }
+                }}
                 placeholder="Contoh: 50"
-                className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#133D86]/20 focus:border-[#133D86] transition-all"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#133D86] transition"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                Tanda Tangan <span className="text-gray-400 font-normal">(Opsional)</span>
+                URL Tanda Tangan <span className="text-gray-400 font-normal">(Opsional)</span>
               </label>
               <input
                 type="text"
@@ -335,7 +329,7 @@ export default function BookingPage() {
                 value={formData.signature_url || ""}
                 onChange={handleChange}
                 placeholder="Contoh: https://example.com/signature.png"
-                className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#133D86]/20 focus:border-[#133D86] transition-all"
+                className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#133D86] transition"
               />
             </div>
 
@@ -343,7 +337,7 @@ export default function BookingPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-[#133D86] hover:bg-[#0d2a5e] text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg shadow-blue-950/15 transition-all duration-200 text-sm uppercase tracking-wider disabled:opacity-50 cursor-pointer"
+                className="w-full bg-[#133D86] hover:bg-[#0d2a5e] text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition duration-200 text-sm uppercase tracking-wider disabled:opacity-50"
               >
                 {isLoading ? "Sedang Mengirim..." : "Kirim Pengajuan Reservasi"}
               </button>
