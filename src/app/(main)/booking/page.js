@@ -18,6 +18,7 @@ export default function BookingPage() {
     signature_url: null,
   });
 
+  const [venueOptions, setVenueOptions] = useState([]);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showVenueDropdown, setShowVenueDropdown] = useState(false);
@@ -30,17 +31,25 @@ export default function BookingPage() {
   const startRef = useRef(null);
   const endRef = useRef(null);
 
-  const venueOptions = [
-    { id: 1, name: "Auditorium" },
-    { id: 2, name: "Arena Budaya" },
-    { id: 3, name: "Dome" },
-  ];
-
   const timeOptions = [
     "06:00:00", "07:00:00", "08:00:00", "09:00:00", "10:00:00",
     "11:00:00", "12:00:00", "13:00:00", "14:00:00", "15:00:00", 
     "16:00:00", "17:00:00", "18:00:00", "19:00:00", "20:00:00", "21:00:00",
   ];
+
+  useEffect(() => {
+    async function fetchVenues() {
+      try {
+        const response = await apiFetch("/venues");
+        const venuesData = Array.isArray(response) ? response : response.data || [];
+        setVenueOptions(venuesData);
+      } catch (error) {
+        console.error("Gagal memuat data gedung:", error);
+      }
+    }
+
+    fetchVenues();
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -126,22 +135,15 @@ export default function BookingPage() {
   const selectedVenueName = venueOptions.find((v) => v.id === formData.venue_id)?.name || "Pilih Gedung";
 
   return (
-    <div className="bg-white min-h-screen py-16 px-6 relative">
-      <div className="max-w-3xl mx-auto mb-6">
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-2 text-[#133D86] hover:text-[#F4B042] text-sm font-semibold transition-colors duration-200"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
-          <span>Beranda</span>
-        </Link>
-      </div>
-
+    <div className="bg-slate-50 min-h-screen py-10 px-6 relative">
       <div className="max-w-3xl mx-auto space-y-8">
+        <div className="flex items-center gap-2 text-xs text-gray-400 mb-9">
+          <Link href="/" className="hover:text-[#133D86] transition">Beranda</Link>
+          <span>/</span>
+          <span className="text-[#133D86] font-semibold">Booking</span>
+        </div>
         <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="inline-block px-3.5 py-1.5 bg-amber-50 text-[#F49D0A] border border-amber-200/70 text-xs font-bold rounded-full uppercase tracking-wider shadow-xs">
+          <span className="inline-block px-3 py-1 bg-[#fcefdb8a] text-[#F4B042] text-xs font-semibold rounded-full uppercase tracking-wider">
             Form Reservasi RaVenue
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#133D86] leading-tight">
@@ -152,7 +154,7 @@ export default function BookingPage() {
           </p>
         </div>
 
-        <div className="bg-[#f5f9fd] rounded-2xl p-6 sm:p-10 shadow-lg shadow-blue-950/5 border border-blue-100/70">
+        <div className="bg-white rounded-2xl p-6 sm:p-10 shadow-sm border border-gray-100">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             <div>
@@ -161,7 +163,7 @@ export default function BookingPage() {
                   Nama Kegiatan <span className="text-red-400/60">*</span>
                 </label>
                 {errors.event_name && (
-                  <span className="text-xs font-normal text-rose-400/80 [text-shadow:_0_0_1px_rgba(251,113,133,0.3)]">{errors.event_name}</span>
+                  <span className="text-xs font-normal text-rose-400/80 [text-shadow:0_0_1px_rgba(251,113,133,0.3)]">{errors.event_name}</span>
                 )}
               </div>
               <input
@@ -181,7 +183,7 @@ export default function BookingPage() {
                   Gedung <span className="text-red-400/60">*</span>
                 </label>
                 {errors.venue_id && (
-                  <span className="text-xs font-normal text-rose-400/80 [text-shadow:_0_0_1px_rgba(251,113,133,0.3)]">{errors.venue_id}</span>
+                  <span className="text-xs font-normal text-rose-400/80 [text-shadow:0_0_1px_rgba(251,113,133,0.3)]">{errors.venue_id}</span>
                 )}
               </div>
               <div 
@@ -195,19 +197,23 @@ export default function BookingPage() {
               </div>
               {showVenueDropdown && (
                 <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                  {venueOptions.map((venue) => (
-                    <div 
-                      key={venue.id} 
-                      onClick={() => { 
-                        setFormData({ ...formData, venue_id: venue.id }); 
-                        setShowVenueDropdown(false); 
-                        if (errors.venue_id) setErrors({ ...errors, venue_id: "" });
-                      }} 
-                      className="px-4 py-2.5 text-xs hover:bg-blue-50 cursor-pointer text-gray-700 border-b border-gray-50 last:border-none font-medium"
-                    >
-                      {venue.name}
-                    </div>
-                  ))}
+                  {venueOptions.length > 0 ? (
+                    venueOptions.map((venue) => (
+                      <div 
+                        key={venue.id} 
+                        onClick={() => { 
+                          setFormData({ ...formData, venue_id: venue.id }); 
+                          setShowVenueDropdown(false); 
+                          if (errors.venue_id) setErrors({ ...errors, venue_id: "" });
+                        }} 
+                        className="px-4 py-2.5 text-xs hover:bg-blue-50 cursor-pointer text-gray-700 border-b border-gray-50 last:border-none font-medium"
+                      >
+                        {venue.name}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2.5 text-xs text-gray-400 text-center">Memuat data gedung...</div>
+                  )}
                 </div>
               )}
             </div>
@@ -233,7 +239,7 @@ export default function BookingPage() {
                     Tanggal <span className="text-red-400/60">*</span>
                   </label>
                   {errors.date && (
-                    <span className="text-xs font-normal text-rose-400/80 [text-shadow:_0_0_1px_rgba(251,113,133,0.3)]">{errors.date}</span>
+                    <span className="text-xs font-normal text-rose-400/80 [text-shadow:0_0_1px_rgba(251,113,133,0.3)]">{errors.date}</span>
                   )}
                 </div>
                 <input

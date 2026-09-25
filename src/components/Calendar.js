@@ -1,10 +1,13 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api";
 
 function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [bookings, setBookings] = useState([]); 
+  const [venues, setVenues] = useState([]); 
+  const [isLoading, setIsLoading] = useState(true);
 
   const monthsName = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
@@ -13,6 +16,35 @@ function Calendar() {
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [bookingsRes, venuesRes] = await Promise.all([
+          apiFetch("/bookings").catch(() => []),
+          apiFetch("/venues").catch(() => [])
+        ]);
+
+        if (Array.isArray(bookingsRes)) {
+          setBookings(bookingsRes);
+        } else if (bookingsRes && Array.isArray(bookingsRes.data)) {
+          setBookings(bookingsRes.data);
+        }
+
+        if (Array.isArray(venuesRes)) {
+          setVenues(venuesRes);
+        } else if (venuesRes && Array.isArray(venuesRes.data)) {
+          setVenues(venuesRes.data);
+        }
+      } catch (error) {
+        console.error("Gagal memuat data dari API:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   const handlePrev = () => {
     setCurrentDate(new Date(year, month - 1, 1));
@@ -62,6 +94,27 @@ function Calendar() {
     }
   }
 
+  const colorPalette = [
+    "bg-red-500", 
+    "bg-green-500", 
+    "bg-blue-600", 
+    "bg-purple-500", 
+    "bg-amber-500", 
+    "bg-teal-500", 
+    "bg-rose-500"
+  ];
+
+  const getVenueColor = (venueName) => {
+    const index = venues.findIndex(v => (v.name || v.venue_name) === venueName);
+    if (index !== -1) {
+      return colorPalette[index % colorPalette.length];
+    }
+    if (venueName?.toLowerCase().includes("auditorium")) return "bg-red-500";
+    if (venueName?.toLowerCase().includes("dome")) return "bg-green-500";
+    if (venueName?.toLowerCase().includes("budaya")) return "bg-blue-600";
+    return "bg-gray-400";
+  };
+
   return (
     <section className="py-12 px-6 bg-slate-50 border-b border-gray-100 font-sans antialiased">
       <div className="max-w-6xl mx-auto">
@@ -104,10 +157,27 @@ function Calendar() {
               <div className="grid grid-cols-7 auto-rows-fr">
                 {calendarDays.map((item, index) => {
                   const isToday = item.dateStr === todayStr;
+                  
+                  const dayBookings = bookings.filter(
+                    (b) => (b.date === item.dateStr || b.start_date === item.dateStr) && 
+                           (b.status === "approved" || b.status === "Disetujui" || b.status === 1)
+                  );
+
                   return (
-                    <div key={index} className={`min-h-[60px] sm:min-h-[75px] border-b border-r border-gray-100 p-2 flex flex-col justify-between transition ${item.isCurrentMonth ? "bg-white" : "bg-slate-50/50"}`}>
+                    <div key={index} className={`min-h-60px sm:min-h-75px border-b border-r border-gray-100 p-2 flex flex-col justify-between transition ${item.isCurrentMonth ? "bg-white" : "bg-slate-50/50"}`}>
                       <div className="flex justify-between items-start">
-                        <div className="flex gap-1 items-center mt-0.5"></div>
+                        <div className="flex gap-1 items-center mt-0.5 flex-wrap max-w-[70%]">
+                          {dayBookings.map((booking, bIdx) => {
+                            const vName = booking.venue_name || booking.venue?.name || booking.venue;
+                            return (
+                              <span 
+                                key={bIdx} 
+                                className={`w-2.5 h-2.5 rounded-full ${getVenueColor(vName)} inline-block`}
+                                title={`${vName}: ${booking.event_name || booking.title}`}
+                              ></span>
+                            );
+                          })}
+                        </div>
                         <span className={`text-xs sm:text-sm font-bold px-2 py-0.5 rounded-md ${isToday ? "bg-[#F4B042] text-white shadow-sm" : item.isCurrentMonth ? "text-gray-800" : "text-gray-300"}`}>
                           {item.dayNum}
                         </span>
@@ -122,7 +192,9 @@ function Calendar() {
 
           <div className="w-full md:w-80 grid grid-cols-2 gap-4 shrink-0 md:mt-2">
             <div className="bg-slate-50 p-5 rounded-xl border border-gray-100 text-center flex flex-col justify-center">
-              <div className="text-2xl font-bold text-[#133D86]">3 Gedung</div>
+              <div className="text-2xl font-bold text-[#133D86]">
+                {venues.length > 0 ? `${venues.length} Gedung` : "Memuat..."}
+              </div>
               <div className="text-xs text-gray-500 mt-1 font-normal">Siap Dipinjam</div>
             </div>
             <div className="bg-slate-50 py-5 px-2 rounded-xl border border-gray-100 text-center flex flex-col items-center justify-center overflow-hidden">
@@ -142,19 +214,24 @@ function Calendar() {
             </div>
 
             <div className="col-span-2 bg-slate-50 p-6 rounded-xl border border-gray-100 space-y-3">
-              <div className="text-sm font-bold text-[#133D86] text-center mb-2">Keterangan gedung yang telah dipinjam</div>
-              <div className="flex items-center gap-2.5 text-sm text-gray-700">
-                <span className="w-3.5 h-3.5 rounded-full bg-red-500 shrink-0"></span>
-                <span className="font-semibold">Auditorium Utama</span>
+              <div className="text-sm font-bold text-[#133D86] text-center mb-2">
+                Keterangan Gedung
               </div>
-              <div className="flex items-center gap-2.5 text-sm text-gray-700">
-                <span className="w-3.5 h-3.5 rounded-full bg-green-500 shrink-0"></span>
-                <span className="font-semibold">Gedung Dome</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-sm text-gray-700">
-                <span className="w-3.5 h-3.5 rounded-full bg-blue-600 shrink-0"></span>
-                <span className="font-semibold">Arena Budaya</span>
-              </div>
+              
+              {venues.length === 0 ? (
+                <div className="text-xs text-center text-gray-400 py-2">Memuat daftar gedung...</div>
+              ) : (
+                venues.map((venue, idx) => {
+                  const vName = venue.name || venue.venue_name;
+                  const colorClass = colorPalette[idx % colorPalette.length];
+                  return (
+                    <div key={venue.id || idx} className="flex items-center gap-2.5 text-sm text-gray-700">
+                      <span className={`w-3.5 h-3.5 rounded-full ${colorClass} shrink-0`}></span>
+                      <span className="font-semibold">{vName}</span>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
 
