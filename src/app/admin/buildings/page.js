@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   useEffect,
   useMemo,
@@ -390,7 +391,7 @@ export default function BuildingsPage() {
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="overflow-x-auto">
 
-          <table className="w-full min-w-[900px] text-left text-sm">
+          <table className="w-full min-w-900px text-left text-sm">
 
             <thead className="border-b border-gray-200 bg-gray-50">
               <tr>
@@ -911,11 +912,14 @@ export default function BuildingsPage() {
                 {selectedBuilding.foto ? (
                   <div className="mb-6 overflow-hidden rounded-lg">
 
-                    <img
-                      src={selectedBuilding.foto}
-                      alt={selectedBuilding.nama}
-                      className="h-64 w-full object-cover"
-                    />
+                <Image
+                  src={selectedBuilding.foto}
+                  alt={selectedBuilding.nama || "Foto gedung"}
+                  width={1200}
+                  height={800}
+                  sizes="(max-width: 640px) 100vw, 768px"
+                  className="h-64 w-full object-cover"
+                />
 
                   </div>
                 ) : (

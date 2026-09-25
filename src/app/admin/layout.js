@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
 import { getPendingBookings } from "./actions";
 
 export default function AdminLayout({ children }) {
@@ -13,7 +15,6 @@ export default function AdminLayout({ children }) {
   const [showProfile, setShowProfile] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-
   const [search, setSearch] = useState("");
   const [searchMessage, setSearchMessage] = useState("");
 
@@ -192,6 +193,7 @@ export default function AdminLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
+
       {/* =========================
           MOBILE OVERLAY
       ========================= */}
@@ -214,12 +216,17 @@ export default function AdminLayout({ children }) {
             : "-translate-x-full"
         }`}
       >
+
         {/* LOGO */}
 
         <div className="flex h-28 items-center justify-between border-b border-white/10 px-6">
-          <img
+
+          <Image
             src="/ravenue_unram_logo.png"
             alt="RaVenue Universitas Mataram"
+            width={150}
+            height={64}
+            priority
             className="h-16 w-auto object-contain"
           />
 
@@ -233,16 +240,19 @@ export default function AdminLayout({ children }) {
           >
             ×
           </button>
+
         </div>
 
         {/* MENU */}
 
         <nav className="flex-1 overflow-y-auto px-4 py-7">
+
           <p className="mb-4 px-3 text-xs font-semibold uppercase tracking-widest text-blue-200/70">
             Menu
           </p>
 
           <div className="space-y-2">
+
             {menus.map((menu) => {
               const isActive =
                 activeMenu.href === menu.href;
@@ -266,12 +276,14 @@ export default function AdminLayout({ children }) {
                 </a>
               );
             })}
+
           </div>
         </nav>
 
         {/* LOGOUT SIDEBAR */}
 
         <div className="border-t border-white/10 p-4">
+
           <button
             type="button"
             onClick={() => {
@@ -281,10 +293,11 @@ export default function AdminLayout({ children }) {
             className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
           >
             <span className="text-lg">↪</span>
-
             <span>Logout</span>
           </button>
+
         </div>
+
       </aside>
 
       {/* =========================
@@ -292,14 +305,17 @@ export default function AdminLayout({ children }) {
       ========================= */}
 
       <div className="min-h-screen md:ml-64">
+
         {/* =========================
             HEADER
         ========================= */}
 
         <header className="sticky top-0 z-30 flex min-h-20 items-center justify-between bg-[#133D86] px-4 py-3 shadow-sm sm:px-6 md:px-8">
+
           {/* LEFT HEADER */}
 
           <div className="flex min-w-0 items-center gap-3">
+
             {/* HAMBURGER MOBILE */}
 
             <button
@@ -332,6 +348,7 @@ export default function AdminLayout({ children }) {
             {/* PAGE NAME */}
 
             <div className="min-w-0">
+
               <p className="text-[10px] font-medium uppercase tracking-wide text-blue-100 sm:text-xs">
                 Admin
               </p>
@@ -339,17 +356,21 @@ export default function AdminLayout({ children }) {
               <h2 className="mt-0.5 truncate text-base font-bold text-white sm:text-lg">
                 {activeMenu.name}
               </h2>
+
             </div>
+
           </div>
 
           {/* RIGHT HEADER */}
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+
             {/* =========================
                 SEARCH
             ========================= */}
 
             <div className="relative">
+
               <button
                 type="button"
                 onClick={() => {
@@ -380,8 +401,11 @@ export default function AdminLayout({ children }) {
 
               {showSearch && (
                 <div className="absolute right-0 top-12 w-[calc(100vw-2rem)] max-w-80 rounded-xl bg-white p-3 shadow-xl">
+
                   <form onSubmit={handleSearchSubmit}>
+
                     <div className="flex items-center rounded-lg border border-gray-300 px-3">
+
                       <svg
                         className="mr-2 h-5 w-5 shrink-0 text-gray-400"
                         fill="none"
@@ -404,12 +428,14 @@ export default function AdminLayout({ children }) {
                         autoFocus
                         className="w-full min-w-0 py-2.5 text-sm text-gray-700 outline-none"
                       />
+
                     </div>
 
                     {/* HASIL SEARCH */}
 
                     {search.trim() && (
                       <div className="mt-2">
+
                         {menus
                           .filter((menu) => {
                             const keyword =
@@ -425,6 +451,7 @@ export default function AdminLayout({ children }) {
                             );
                           })
                           .map((menu) => (
+
                             <button
                               key={menu.href}
                               type="button"
@@ -436,11 +463,13 @@ export default function AdminLayout({ children }) {
                               }}
                               className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left transition hover:bg-blue-50"
                             >
+
                               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 text-sm text-[#133D86]">
                                 {menu.icon}
                               </span>
 
                               <span className="min-w-0">
+
                                 <span className="block text-sm font-semibold text-gray-800">
                                   {menu.name}
                                 </span>
@@ -448,8 +477,11 @@ export default function AdminLayout({ children }) {
                                 <span className="block text-xs text-gray-500">
                                   {menu.description}
                                 </span>
+
                               </span>
+
                             </button>
+
                           ))}
 
                         {/* TIDAK ADA HASIL */}
@@ -467,7 +499,9 @@ export default function AdminLayout({ children }) {
                               .includes(keyword)
                           );
                         }).length === 0 && (
+
                           <div className="px-3 py-4 text-center">
+
                             <p className="text-sm font-medium text-gray-700">
                               Tidak ditemukan
                             </p>
@@ -475,8 +509,10 @@ export default function AdminLayout({ children }) {
                             <p className="mt-1 text-xs text-gray-400">
                               Coba gunakan kata kunci lain.
                             </p>
+
                           </div>
                         )}
+
                       </div>
                     )}
 
@@ -487,9 +523,12 @@ export default function AdminLayout({ children }) {
                         {searchMessage}
                       </p>
                     )}
+
                   </form>
+
                 </div>
               )}
+
             </div>
 
             {/* =========================
@@ -497,6 +536,7 @@ export default function AdminLayout({ children }) {
             ========================= */}
 
             <div className="relative">
+
               <button
                 type="button"
                 onClick={() => {
@@ -509,6 +549,7 @@ export default function AdminLayout({ children }) {
                 className="relative flex h-10 w-10 items-center justify-center rounded-lg transition hover:bg-white/10"
                 title="Notifikasi"
               >
+
                 <svg
                   className="h-5 w-5 text-[#eee] transition-colors hover:text-[#D18408]"
                   fill="none"
@@ -532,18 +573,20 @@ export default function AdminLayout({ children }) {
                       : pendingBookings.length}
                   </span>
                 )}
+
               </button>
 
-              {/* =========================
-                  NOTIFICATION DROPDOWN
-              ========================= */}
+              {/* NOTIFICATION DROPDOWN */}
 
               {showNotification && (
                 <div className="absolute right-0 top-12 z-50 w-[calc(100vw-2rem)] max-w-80 overflow-hidden rounded-xl bg-white shadow-xl">
+
                   {/* HEADER */}
 
                   <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+
                     <div>
+
                       <h3 className="text-sm font-bold text-gray-800">
                         Notifikasi
                       </h3>
@@ -551,6 +594,7 @@ export default function AdminLayout({ children }) {
                       <p className="mt-0.5 text-xs text-gray-400">
                         Pengajuan peminjaman
                       </p>
+
                     </div>
 
                     {pendingBookings.length > 0 && (
@@ -558,24 +602,31 @@ export default function AdminLayout({ children }) {
                         {pendingBookings.length} baru
                       </span>
                     )}
+
                   </div>
 
                   {/* LOADING */}
 
                   {notificationLoading ? (
+
                     <div className="px-4 py-8 text-center">
+
                       <div className="mx-auto mb-3 h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-[#133D86]" />
 
                       <p className="text-sm text-gray-500">
                         Memeriksa pengajuan...
                       </p>
+
                     </div>
-                  ) : pendingBookings.length ===
-                    0 ? (
+
+                  ) : pendingBookings.length === 0 ? (
+
                     /* TIDAK ADA NOTIFIKASI */
 
                     <div className="px-4 py-8 text-center">
+
                       <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
@@ -590,6 +641,7 @@ export default function AdminLayout({ children }) {
                             d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9a6 6 0 1 0-12 0v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"
                           />
                         </svg>
+
                       </div>
 
                       <p className="text-sm font-medium text-gray-700">
@@ -600,14 +652,20 @@ export default function AdminLayout({ children }) {
                         Pengajuan baru akan muncul di
                         sini.
                       </p>
+
                     </div>
+
                   ) : (
+
                     /* ADA NOTIFIKASI */
 
                     <div>
+
                       <div className="max-h-80 overflow-y-auto">
+
                         {pendingBookings.map(
                           (booking) => (
+
                             <button
                               key={booking.id}
                               type="button"
@@ -622,10 +680,13 @@ export default function AdminLayout({ children }) {
                               }}
                               className="w-full border-b border-gray-100 px-4 py-4 text-left transition hover:bg-gray-50"
                             >
+
                               <div className="flex gap-3">
+
                                 {/* ICON */}
 
                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[#133D86]">
+
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"
@@ -640,11 +701,13 @@ export default function AdminLayout({ children }) {
                                       d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                                     />
                                   </svg>
+
                                 </div>
 
                                 {/* INFORMASI BOOKING */}
 
                                 <div className="min-w-0 flex-1">
+
                                   <p className="text-sm font-semibold text-gray-800">
                                     Pengajuan baru
                                   </p>
@@ -667,15 +730,20 @@ export default function AdminLayout({ children }) {
                                       {booking.created_at}
                                     </p>
                                   )}
+
                                 </div>
 
                                 {/* PENANDA BARU */}
 
                                 <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
+
                               </div>
+
                             </button>
+
                           )
                         )}
+
                       </div>
 
                       {/* LIHAT SEMUA */}
@@ -692,10 +760,14 @@ export default function AdminLayout({ children }) {
                       >
                         Lihat semua pengajuan
                       </button>
+
                     </div>
+
                   )}
+
                 </div>
               )}
+
             </div>
 
             {/* =========================
@@ -703,6 +775,7 @@ export default function AdminLayout({ children }) {
             ========================= */}
 
             <div className="relative ml-1 border-l border-white/20 pl-2 sm:ml-2 sm:pl-4">
+
               <button
                 type="button"
                 onClick={() => {
@@ -712,11 +785,13 @@ export default function AdminLayout({ children }) {
                 }}
                 className="flex items-center gap-2 rounded-lg px-1.5 py-1.5 transition hover:bg-white/10 sm:gap-3 sm:px-2"
               >
+
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-[#133D86] sm:h-10 sm:w-10">
                   A
                 </div>
 
                 <div className="hidden text-left sm:block">
+
                   <p className="text-sm font-semibold text-white">
                     Administrator
                   </p>
@@ -724,16 +799,20 @@ export default function AdminLayout({ children }) {
                   <p className="text-xs text-blue-100">
                     Admin
                   </p>
+
                 </div>
 
                 <span className="hidden text-xs text-blue-100 sm:block">
                   {showProfile ? "▴" : "▾"}
                 </span>
+
               </button>
 
               {showProfile && (
                 <div className="absolute right-0 top-14 w-64 max-w-[calc(100vw-2rem)] rounded-xl bg-white p-2 shadow-xl">
+
                   <div className="px-3 py-3">
+
                     <p className="text-sm font-semibold text-gray-800">
                       Administrator
                     </p>
@@ -741,11 +820,16 @@ export default function AdminLayout({ children }) {
                     <p className="text-xs text-gray-500">
                       Admin RaVenue
                     </p>
+
                   </div>
+
                 </div>
               )}
+
             </div>
+
           </div>
+
         </header>
 
         {/* =========================
@@ -755,6 +839,7 @@ export default function AdminLayout({ children }) {
         <main className="p-4 sm:p-6 md:p-8">
           {children}
         </main>
+
       </div>
 
       {/* =========================
@@ -762,9 +847,13 @@ export default function AdminLayout({ children }) {
       ========================= */}
 
       {showLogoutModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 px-4">
+
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 px-4">
+
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+
             <div className="text-center">
+
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-2xl">
                 ↪
               </div>
@@ -777,9 +866,11 @@ export default function AdminLayout({ children }) {
                 Apakah kamu yakin ingin keluar dari
                 halaman admin?
               </p>
+
             </div>
 
             <div className="mt-6 flex gap-3">
+
               <button
                 type="button"
                 onClick={() =>
@@ -797,10 +888,15 @@ export default function AdminLayout({ children }) {
               >
                 Ya, Logout
               </button>
+
             </div>
+
           </div>
+
         </div>
+
       )}
+
     </div>
   );
 }
