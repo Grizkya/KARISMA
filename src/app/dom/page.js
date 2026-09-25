@@ -4,16 +4,17 @@ import Image from 'next/image';
 export default function DomPage() {
   return (
     <main className="max-w-4xl mx-auto p-6 font-sans">
-      {/* Tombol Kembali */}
-    <Link href="/" className="text-blue-600 font-medium hover:underline inline-block mb-4">
-    &larr; Kembali ke Daftar Gedung
-    </Link>
+      <div className="flex items-center gap-2 text-xs text-gray-400 mb-9">
+        <Link href="/" className="hover:text-[#133D86] transition">Beranda</Link>
+        <span>/</span>
+        <span className="text-[#133D86] font-semibold">dom</span>
+      </div>
 
       <div className="bg-white border rounded-2xl p-6 shadow-sm">
         {/* Banner Gambar */}
         <div className="relative w-full h-80 rounded-xl overflow-hidden mb-6 bg-gray-100">
           <Image 
-            src="/images/dom.jpg" 
+            src="/dom.jpeg" 
             alt="Gedung Dome H. Sunarpi" 
             fill 
             className="object-cover"
@@ -37,7 +38,7 @@ export default function DomPage() {
         {/* Detail Penjelasan */}
         <div className="space-y-6">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">Penjelasan Gedung</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Keterangan Gedung</h2>
             <p className="text-gray-600 leading-relaxed">
               Gedung Dome H. Sunarpi merupakan fasilitas serbaguna indoor di Universitas Mataram yang biasa digunakan untuk berbagai kegiatan kemahasiswaan skala besar. Gedung ini ideal untuk pelaksanaan kompetisi olahraga indoor, expo kampus, festival seni, pameran, hingga kegiatan penerimaan mahasiswa baru.
             </p>

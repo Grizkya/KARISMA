@@ -8,7 +8,7 @@ function ListGedung() {
       nama: "Auditorium Yusuf Abu Bakar",
       kapasitas: "1.000+ Orang",
       deskripsi: "Gedung utama kampus untuk kegiatan wisuda, yudisium, seminar nasional, dan acara resmi Universitas Mataram.",
-      gambar: "/images/auditorium.jpg",
+      gambar: "/auditorium.jpeg",
       link: "/auditorium",
     },
     {
@@ -16,7 +16,7 @@ function ListGedung() {
       nama: "Gedung Dome H. Sunarpi",
       kapasitas: "800+ Orang",
       deskripsi: "Gedung serbaguna untuk kegiatan olahraga indoor, expo kampus, kompetisi mahasiswa, dan pameran.",
-      gambar: "/images/dom.jpg",
+      gambar: "/dom.jpeg",
       link: "/dom",
     },
     {
@@ -24,15 +24,15 @@ function ListGedung() {
       nama: "Arena Budaya",
       kapasitas: "500+ Orang",
       deskripsi: "Pusat kegiatan seni, kebudayaan, pementasan, dan tempat berkumpul kelompok mahasiswa.",
-      gambar: "/images/arena-budaya.jpg",
+      gambar: "/arena-budaya.jpeg",
       link: "/arena-budaya",
     },
   ];
 
   return (
-    <section className="py-16 px-6 ">
+    <section className="py-10 px-6 bg-slate-50">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Header Seksi Gedung */}
         <div className="text-center mb-12 space-y-2">
           <span className="inline-block px-3 py-1 bg-[#fcefdb8a] text-[#F4B042] text-xs font-semibold rounded-full uppercase tracking-wider">

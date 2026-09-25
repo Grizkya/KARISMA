@@ -4,14 +4,16 @@ import Image from 'next/image';
 export default function AuditoriumPage() {
   return (
     <main className="max-w-4xl mx-auto p-6 font-sans">
-    <Link href="/" className="text-blue-600 font-medium hover:underline inline-block mb-4">
-    &larr; Kembali ke Daftar Gedung
-    </Link>
+      <div className="flex items-center gap-2 text-xs text-gray-400 mb-9">
+        <Link href="/" className="hover:text-[#133D86] transition">Beranda</Link>
+        <span>/</span>
+        <span className="text-[#133D86] font-semibold">auditorium</span>
+      </div>
 
       <div className="bg-white border rounded-2xl p-6 shadow-sm">
         <div className="relative w-full h-80 rounded-xl overflow-hidden mb-6 bg-gray-100">
           <Image 
-            src="/images/auditorium.jpg" 
+            src="/auditorium.jpeg" 
             alt="Auditorium Yusuf Abu Bakar" 
             fill 
             className="object-cover"
@@ -33,7 +35,7 @@ export default function AuditoriumPage() {
 
         <div className="space-y-6">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">Penjelasan Gedung</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Keterangan Gedung</h2>
             <p className="text-gray-600 leading-relaxed">
               Auditorium Yusuf Abu Bakar adalah gedung pertemuan utama di Universitas Mataram yang diperuntukkan bagi acara-acara formal universitas. Gedung ini menjadi lokasi utama untuk prosesi Wisuda, Yudisium fakultas, Pengukuhan Guru Besar, Seminar Nasional/Internasional, serta Kuliah Umum.
             </p>

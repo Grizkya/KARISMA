@@ -3,7 +3,7 @@ import Link from "next/link";
 
 function About() {
   return (
-    <section className="py-4 px-6 bg-slate-50 border-t border-b border-gray-100">
+    <section className="py-10 px-6 bg-slate-50 border-t border-b border-gray-100">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-2xl p-8 sm:p-12 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-10">
           

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 export default function AdminLayout({ children }) {
@@ -13,6 +13,22 @@ export default function AdminLayout({ children }) {
   const [showProfile, setShowProfile] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [search, setSearch] = useState("");
+  const [adminUser, setAdminUser] = useState({ name: "Administrator", email: "" });
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const u = JSON.parse(storedUser);
+        setAdminUser({
+          name: u.name || "Administrator",
+          email: u.email || "",
+        });
+      } catch (e) {
+        console.error("Error reading admin user data", e);
+      }
+    }
+  }, []);
 
   const menus = [
     {
@@ -51,17 +67,20 @@ export default function AdminLayout({ children }) {
   // =========================
   const handleLogout = async () => {
     try {
-      // Hapus session yang tersimpan di browser
+      // Hapus session dan role yang tersimpan di cookie
       document.cookie =
         "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-
+      document.cookie =
+        "user_role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie =
         "user_profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
       setShowLogoutModal(false);
 
-      router.push("/login");
-      router.refresh();
+      window.location.href = "/login";
     } catch (error) {
       console.error("Logout gagal:", error);
     }
@@ -93,6 +112,8 @@ export default function AdminLayout({ children }) {
           <Image
             src="/ravenue_unram_logo.png"
             alt="RaVenue Universitas Mataram"
+            width={150}
+            height={40}
             className="h-16 w-auto object-contain"
           />
         </div>
@@ -125,6 +146,17 @@ export default function AdminLayout({ children }) {
                 </a>
               );
             })}
+          </div>
+
+          <div className="mt-8 border-t border-white/10 pt-4">
+            <a
+              href="/"
+              className="flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-amber-300 transition hover:bg-white/10"
+              title="Lihat Website Tampilan Pengguna"
+            >
+              <span className="flex w-6 justify-center text-base">🌐</span>
+              <span>Web Pengguna</span>
+            </a>
           </div>
         </nav>
 
@@ -255,12 +287,12 @@ export default function AdminLayout({ children }) {
                 className="flex items-center gap-3 rounded-lg px-2 py-1.5 transition hover:bg-white/10"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white font-bold text-[#133D86]">
-                  A
+                  {adminUser.name ? adminUser.name.charAt(0).toUpperCase() : "A"}
                 </div>
 
                 <div className="hidden text-left sm:block">
-                  <p className="text-sm font-semibold text-white">
-                    Administrator
+                  <p className="text-sm font-semibold text-white max-w-32 truncate">
+                    {adminUser.name}
                   </p>
 
                   <p className="text-xs text-blue-100">
@@ -274,15 +306,39 @@ export default function AdminLayout({ children }) {
               </button>
 
               {showProfile && (
-                <div className="absolute right-0 top-14 w-64 rounded-xl bg-white p-2 shadow-xl">
-                  <div className="px-3 py-3">
-                    <p className="text-sm font-semibold text-gray-800">
-                      Administrator
+                <div className="absolute right-0 top-14 w-64 rounded-xl bg-white p-2 shadow-xl z-50">
+                  <div className="px-3 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-800 truncate">
+                      {adminUser.name}
                     </p>
 
-                    <p className="text-xs text-gray-500">
-                      Admin RaVenue
+                    <p className="text-xs text-gray-500 truncate">
+                      {adminUser.email}
                     </p>
+                    <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-semibold bg-blue-100 text-blue-800 rounded">
+                      Administrator
+                    </span>
+                  </div>
+
+                  <div className="p-1 space-y-1">
+                    <a
+                      href="/"
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                    >
+                      <span>🌐</span>
+                      <span>Lihat Website (User)</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowProfile(false);
+                        setShowLogoutModal(true);
+                      }}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <span>↪</span>
+                      <span>Logout</span>
+                    </button>
                   </div>
                 </div>
               )}

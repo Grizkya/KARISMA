@@ -41,23 +41,13 @@ export default function About() {
   ];
 
   return (
-    <div className="bg-slate-50 min-h-screen py-16 px-6 relative">
-      
-      {/* TOMBOL PANAH KEMBALI */}
-      <div className="max-w-5xl mx-auto mb-6">
-        <Link 
-            href="/" 
-            className="inline-flex items-center gap-2 text-[#133D86] hover:text-[#F4B042] text-sm font-semibold transition-colors duration-200"
-            title="Kembali ke Beranda"
-        >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            <span className="hidden xs:inline sm:inline">Beranda</span>
-        </Link>
-      </div>
-
+    <div className="bg-slate-50 min-h-screen py-10 px-6 relative">
       <div className="max-w-5xl mx-auto space-y-12">
+        <div className="flex items-center gap-2 text-xs text-gray-400 mb-9">
+          <Link href="/" className="hover:text-[#133D86] transition">Beranda</Link>
+          <span>/</span>
+          <span className="text-[#133D86] font-semibold">Tentang</span>
+        </div>
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <span className="inline-block px-3 py-1 bg-[#fcefdb8a] text-[#F4B042] text-xs font-semibold rounded-full uppercase tracking-wider">
             Tentang RaVenue
@@ -72,11 +62,11 @@ export default function About() {
 
         <div className="bg-white rounded-2xl p-8 sm:p-12 shadow-sm border border-gray-100">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#133D86]">
               Transformasi Layanan Sarana & Prasarana
             </h2>
             <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
-              <strong className="text-[#F4B042]">RaVenue</strong> merupakan platform digital yang dirancang khusus untuk memudahkan proses peminjaman gedung dan fasilitas di lingkungan <strong className="text-[#133D86]">Universitas Mataram</strong>.
+              <strong className="text-[#F4B042]">RaVenue</strong> merupakan platform digital yang dirancang khusus untuk memudahkan proses peminjaman gedung dan fasilitas di lingkungan Universitas Mataram.
             </p>
             <p className="text-gray-600 leading-relaxed text-base">
               Melalui sistem terintegrasi ini, civitas akademika maupun pihak luar dapat melihat informasi fasilitas yang tersedia secara detail, mengajukan peminjaman secara online, memantau status pengajuan secara langsung, serta mengetahui jadwal penggunaan gedung agar pemanfaatan sarana kampus berjalan lebih efisien dan terorganisir.

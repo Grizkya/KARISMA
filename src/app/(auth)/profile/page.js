@@ -1,40 +1,112 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api"; 
+import { logoutAction } from "@/lib/auth";
 
 export default function Profile() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
-  
-  // State data pengguna
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "johndoe@unram.ac.id",
-    phone: "081234567890",
-    password: "password123",
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
   });
 
-  const [isEditing, setIsEditing] = useState(false);
+  // Load Data Profil dari Backend / LocalStorage
+  useEffect(() => {
+    let token = localStorage.getItem("token");
+    if (!token) {
+      // Periksa apakah token tersimpan di cookie
+      const match = document.cookie.match(new RegExp('(^| )session_token=([^;]+)'));
+      if (match && match[2]) {
+        token = match[2];
+        localStorage.setItem("token", token);
+      }
+    }
+
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    const fetchUserProfile = async () => {
+      try {
+        const data = await apiFetch("/profile", { token }); // Memakai helper apiFetch
+        if (data) {
+          setUserData((prev) => ({
+            ...prev,
+            name: data.name || "",
+            email: data.email || "",
+            phone: data.phone || "",
+          }));
+        }
+      } catch (err) {
+        // Jika endpoint /profile belum ada, fallback ambil dari localStorage
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const userObj = JSON.parse(storedUser);
+          setUserData((prev) => ({
+            ...prev,
+            name: userObj.name || "",
+            email: userObj.email || "",
+            phone: userObj.phone || "",
+          }));
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [router]);
 
   const handleChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // Simpan Update Profil ke API
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsEditing(false);
-    // Tambahkan logika simpan/update ke database di sini
+    setLoading(true);
+    const token = localStorage.getItem("token");
+
+    try {
+      await apiFetch("/profile", {
+        method: "PUT",
+        body: userData,
+        token: token,
+      });
+
+      // Update LocalStorage agar sesuai
+      localStorage.setItem("user", JSON.stringify(userData));
+      alert("Profil berhasil diperbarui!");
+      setIsEditing(false);
+    } catch (err) {
+      alert(err.message || "Gagal mengupdate profil.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Logout Handler
+  const handleLogout = async () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    await logoutAction(); // Menghapus cookie di server & mere-direct ke /login
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 sm:p-8">
       <div className="bg-[#133D86] w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-135.5">
         
-        {/* SISI KIRI: Banner Branding & Avatar */}
+        {/* SISI KIRI */}
         <div className="w-full md:w-1/2 p-8 md:p-12 text-white flex flex-col justify-center items-center text-center relative bg-linear-to-br from-[#133D86] to-[#f4b04252]">
-          
-          {/* Tombol Beranda */}
           <Link 
             href="/" 
             className="absolute top-4 right-4 sm:top-6 sm:right-6 flex items-center gap-2 text-white/80 hover:text-[#F4B042] text-xs sm:text-sm font-medium transition-colors duration-200 px-3 py-1.5 sm:px-0 sm:py-0 rounded-full sm:rounded-none"
@@ -46,7 +118,6 @@ export default function Profile() {
             <span className="hidden xs:inline sm:inline">Beranda</span>
           </Link>
 
-          {/* Icon Profil Large */}
           <div className="mb-3 text-white p-3">
             <svg className="w-20 h-20 text-white" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
@@ -54,16 +125,15 @@ export default function Profile() {
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-wider mb-4 uppercase">
-            Halo <br></br> {userData.name}!
+            Halo <br/> {userData.name || "User"}!
           </h2>
           <p className="text-sm text-gray-200 leading-relaxed max-w-sm">
             Kelola informasi profil akun Anda untuk mempermudah proses verifikasi dan peminjaman fasilitas kampus.
           </p>
         </div>
 
-        {/* SISI KANAN: Form Detail Akun */}
+        {/* SISI KANAN */}
         <div className="w-full md:w-1/2 bg-white p-8 md:p-10 flex flex-col justify-center items-center">
-          
           <div className="mb-6 w-full text-center">
             <h1 className="text-3xl sm:text-3xl font-bold text-[#133D86] tracking-tight">
               Profil Saya
@@ -71,8 +141,6 @@ export default function Profile() {
           </div>
 
           <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3.5">
-            
-            {/* Input Nama */}
             <div>
               <label className="text-xs font-semibold text-gray-600 mb-1 block">Nama Lengkap</label>
               <input 
@@ -90,7 +158,6 @@ export default function Profile() {
               />
             </div>
 
-            {/* Input Email */}
             <div>
               <label className="text-xs font-semibold text-gray-600 mb-1 block">Email</label>
               <input 
@@ -108,7 +175,6 @@ export default function Profile() {
               />
             </div>
 
-            {/* Input Nomor Telepon */}
             <div>
               <label className="text-xs font-semibold text-gray-600 mb-1 block">Nomor Telepon</label>
               <input 
@@ -126,7 +192,6 @@ export default function Profile() {
               />
             </div>
 
-            {/* Input Password */}
             <div>
               <label className="text-xs font-semibold text-gray-600 mb-1 block">Password</label>
               <div className="relative w-full">
@@ -157,15 +222,15 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Aksi Tombol Edit / Simpan */}
             <div className="flex gap-3 mt-3">
               {isEditing ? (
                 <>
                   <button 
                     type="submit" 
-                    className="flex-1 bg-[#133D86] text-white py-2.5 rounded-lg font-semibold hover:bg-[#0d2a5e] transition duration-200 shadow-md text-sm"
+                    disabled={loading}
+                    className="flex-1 bg-[#133D86] text-white py-2.5 rounded-lg font-semibold hover:bg-[#0d2a5e] transition duration-200 shadow-md text-sm disabled:opacity-50"
                   >
-                    Simpan Perubahan
+                    {loading ? "Menyimpan..." : "Simpan Perubahan"}
                   </button>
                   <button 
                     type="button" 
@@ -186,18 +251,17 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Tombol Logout */}
             <div className="text-center mt-2">
-              <Link 
-                href="/login"
-                className="text-red-600 hover:text-red-700 text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1"
+              <button 
+                type="button"
+                onClick={handleLogout}
+                className="text-red-600 hover:text-red-700 text-sm font-medium transition-colors duration-200 inline-flex items-center gap-1 bg-transparent border-0 cursor-pointer"
               >
                 <span>Keluar dari Akun</span>
-              </Link>
+              </button>
             </div>
 
           </form>
-
         </div>
 
       </div>

@@ -6,7 +6,7 @@ function Calendar() {
   const [activeTab, setActiveTab] = useState("Bulan");
 
   const monthsName = [
-    "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"
   ];
 
@@ -62,13 +62,13 @@ function Calendar() {
   }
 
   return (
-    <section className="py-12 px-6 bg-slate-50 border-b border-gray-100">
+    <section className="py-10 px-6 bg-slate-50 border-b border-gray-100">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-2xl p-8 sm:p-12 shadow-sm border border-gray-100 flex flex-col md:flex-row items-start justify-between gap-10">
-          
+
           {/* SISI KIRI: Header, Kontrol, & Widget Grid Kalender */}
           <div className="flex-1 w-full text-left space-y-6">
-            
+
             {/* Header & Title mirip About */}
             <div className="space-y-2">
               <div className="inline-block px-3 py-1 bg-blue-50 text-[#133D86] text-xs font-semibold rounded-full uppercase tracking-wider">
@@ -103,9 +103,8 @@ function Calendar() {
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-3 py-1 text-xs font-semibold rounded-md transition ${
-                      activeTab === tab ? "bg-white text-[#133D86] shadow-sm" : "text-white hover:bg-[#0d2a5e]"
-                    }`}
+                    className={`px-3 py-1 text-xs font-semibold rounded-md transition ${activeTab === tab ? "bg-white text-[#133D86] shadow-sm" : "text-white hover:bg-[#0d2a5e]"
+                      }`}
                   >
                     {tab}
                   </button>
@@ -167,7 +166,7 @@ function Calendar() {
       </div>
     </section>
   );
-} 
+}
 
 export default function Home() {
   return (

@@ -1,40 +1,29 @@
-import { cookies } from 'next/headers';
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
+const PROJECT = process.env.NEXT_PUBLIC_PROJECT_ID;
+const KEY = process.env.NEXT_PUBLIC_API_KEY;
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://hmif.if.unram.ac.id/api/v2';
-const PROJECT = process.env.NEXT_PUBLIC_PROJECT_ID || 'ravenue';
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || 'pk_ravenue_9bda1b42faee2c8c';
-
-export async function apiFetch(endpoint, options = {}) {
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  const url = `${BASE_URL}/${PROJECT}${cleanEndpoint}`;
-
-  let bearerToken = '';
-  try {
-    const cookieStore = await cookies();
-    bearerToken = cookieStore.get('session_token')?.value || '';
-  } catch (e) {
-    // Dipanggil dari Client Component
-  }
-
+export async function apiFetch(path, { method = 'GET', body, token } = {}) {
   const headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'X-API-Key': API_KEY, // Layer 1: Akses Backend Kelompok
+    Accept: 'application/json',
+    'X-API-Key': KEY,
   };
-
-  if (bearerToken) {
-    headers['Authorization'] = `Bearer ${bearerToken}`; // Layer 2: User Session JWT
+  if (token) headers.Authorization = 'Bearer ' + token;
+  let verb = method.toUpperCase();
+  let suffix = '';
+  if (verb === 'PUT' || verb === 'DELETE') {
+    headers['X-HTTP-Method-Override'] = verb;
+    suffix = (path.indexOf('?') === -1 ? '?' : '&') + '_method=' + verb;
+    verb = 'POST';
   }
-
-  const res = await fetch(url, {
-    ...options,
-    headers: { ...headers, ...options.headers },
+  if (body) headers['Content-Type'] = 'application/json';
+  const res = await fetch(BASE + '/' + PROJECT + path + suffix, {
+    method: verb,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
   });
-
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(data.message || `Request gagal: status ${res.status}`);
-  }
-
+  if (!res.ok) throw new Error(data.message || res.statusText);
   return data;
 }
+
+// contoh: apiFetch('/users');
