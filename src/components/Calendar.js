@@ -115,20 +115,20 @@ function Calendar() {
   };
 
   return (
-    <section className="py-12 px-6 bg-slate-50 border-b border-gray-100 font-sans antialiased">
+    <section className="py-10 px-6 bg-slate-50 border-b border-gray-100 font-sans antialiased">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-2xl p-8 sm:p-12 shadow-sm border border-gray-100 flex flex-col md:flex-row items-start justify-between gap-10">
           
           <div className="flex-1 w-full text-left space-y-6">
             
             <div className="space-y-2">
-              <div className="inline-block px-3.5 py-1.5 bg-blue-50 text-[#133D86] text-sm font-bold rounded-full uppercase tracking-wider">
+              <div className="inline-block px-3 py-1 bg-blue-50 text-[#133D86] text-xs font-semibold rounded-full uppercase tracking-wider">
                 Jadwal & Ketersediaan
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-[#133D86] tracking-tight">
                 Kalender Gedung
               </h2>
-              <p className="text-gray-600 text-base sm:text-lg leading-relaxed font-normal">
+              <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
                 Pantau jadwal peminjaman gedung dan agenda kegiatan Universitas Mataram secara interaktif.
               </p>
             </div>
@@ -242,8 +242,8 @@ function Calendar() {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50 pb-12 font-sans antialiased">
-      <div className="text-center p-10">
+    <div className="min-h-screen bg-gray-50 font-sans antialiased">
+      <div className="text-center">
       </div>
       
       <div className="px-4">
