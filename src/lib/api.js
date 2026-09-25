@@ -57,3 +57,8 @@ export async function fetchApi(endpoint, options = {}) {
 export async function getBookings() {
   return fetchApi("/ravenue/bookings");
 }
+
+// Mengambil semua data venue/gedung dari RaVenue
+export async function getVenues() {
+  return fetchApi("/ravenue/venues");
+}
