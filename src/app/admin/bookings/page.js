@@ -1,13 +1,127 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import {
+  getBookings,
+  updateBookingStatus,
+  deleteBooking,
+} from "./actions";
 
 export default function BookingsPage() {
   const [search, setSearch] = useState("");
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // DATA BOOKING AKAN DIAMBIL DARI DATABASE NANTI
-  const bookings = [];
+  const formatBookings = (dataBookings = []) =>
+    dataBookings.map((booking) => ({
+      id: booking.id,
+      nama: booking.user_name,
+      email: "-",
+      kegiatan: booking.event_name,
+      gedung: booking.venue_name,
+      tanggal: booking.date,
+      jam_mulai: booking.start_time,
+      jam_selesai: booking.end_time,
+      deskripsi: booking.purpose,
+      status: booking.status,
+      jumlah_peserta: booking.participant_count,
+      lokasi_gedung: booking.venue_location,
+      catatan_admin: booking.admin_note,
+      created_at: booking.created_at,
+    }));
+
+  async function reloadBookings() {
+    const result = await getBookings();
+
+    setBookings(
+      formatBookings(Array.isArray(result) ? result : [])
+    );
+  }
+
+  async function handleApprove(id) {
+    try {
+      await updateBookingStatus(id, "approved");
+
+      alert("Booking berhasil disetujui.");
+
+      await reloadBookings();
+
+      setSelectedBooking(null);
+    } catch (error) {
+      console.error(error);
+      alert(error.message || "Gagal menyetujui booking.");
+    }
+  }
+
+  async function handleReject(id) {
+    try {
+      await updateBookingStatus(id, "rejected");
+
+      alert("Booking berhasil ditolak.");
+
+      await reloadBookings();
+
+      setSelectedBooking(null);
+    } catch (error) {
+      console.error(error);
+      alert(error.message || "Gagal menolak booking.");
+    }
+  }
+
+  async function handleDelete(id) {
+    const yakin = window.confirm(
+      "Apakah kamu yakin ingin menghapus booking ini?"
+    );
+
+    if (!yakin) {
+      return;
+    }
+
+    try {
+      await deleteBooking(id);
+
+      alert("Booking berhasil dihapus.");
+
+      await reloadBookings();
+
+      if (selectedBooking?.id === id) {
+        setSelectedBooking(null);
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error.message || "Gagal menghapus booking.");
+    }
+  }
+
+  useEffect(() => {
+    async function loadBookings() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const result = await getBookings();
+
+        setBookings(
+          formatBookings(
+            Array.isArray(result) ? result : []
+          )
+        );
+      } catch (err) {
+        console.error("Gagal mengambil data booking:", err);
+
+        setError(
+          err.message || "Gagal mengambil data booking."
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadBookings();
+  }, []);
 
   const filteredBookings = bookings.filter((booking) => {
     const keyword = search.toLowerCase();
@@ -20,29 +134,29 @@ export default function BookingsPage() {
     );
   });
 
-  // APPROVE
-  const handleApprove = (booking) => {
-    console.log("Approve:", booking);
-    // Nanti dihubungkan ke API
-  };
+  // =========================
+  // HITUNG STATUS BOOKING
+  // =========================
 
-  // REJECT
-  const handleReject = (booking) => {
-    console.log("Reject:", booking);
-    // Nanti dihubungkan ke API
-  };
+  const totalBooking = bookings.length;
 
-  // DELETE
-  const handleDelete = (booking) => {
-    console.log("Delete:", booking);
-    // Nanti dihubungkan ke API
-  };
+  const jumlahPending = bookings.filter(
+    (booking) => booking.status === "pending"
+  ).length;
+
+  const jumlahApproved = bookings.filter(
+    (booking) => booking.status === "approved"
+  ).length;
+
+  const jumlahRejected = bookings.filter(
+    (booking) => booking.status === "rejected"
+  ).length;
 
   return (
     <div>
       {/* HEADER */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#133D86] tracking-tight mt-1">
           Booking
         </h1>
 
@@ -52,44 +166,48 @@ export default function BookingsPage() {
       </div>
 
       {/* RINGKASAN */}
-      <div className="mb-6 grid grid-cols-1 gap-5 md:grid-cols-3">
+      <div className="mb-6 grid grid-cols-1 gap-5 md:grid-cols-4">
+        {/* TOTAL BOOKING */}
         <div className="rounded-xl bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">
             Total Booking
           </p>
 
           <h2 className="mt-2 text-2xl font-bold text-gray-800">
-            {bookings.length}
+            {totalBooking}
           </h2>
         </div>
 
+        {/* MENUNGGU */}
         <div className="rounded-xl bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">
             Menunggu Persetujuan
           </p>
 
           <h2 className="mt-2 text-2xl font-bold text-yellow-600">
-            {
-              bookings.filter(
-                (booking) =>
-                  booking.status === "Menunggu"
-              ).length
-            }
+            {jumlahPending}
           </h2>
         </div>
 
+        {/* DISETUJUI */}
         <div className="rounded-xl bg-white p-5 shadow-sm">
           <p className="text-sm text-gray-500">
             Disetujui
           </p>
 
           <h2 className="mt-2 text-2xl font-bold text-green-600">
-            {
-              bookings.filter(
-                (booking) =>
-                  booking.status === "Disetujui"
-              ).length
-            }
+            {jumlahApproved}
+          </h2>
+        </div>
+
+        {/* DITOLAK */}
+        <div className="rounded-xl bg-white p-5 shadow-sm">
+          <p className="text-sm text-gray-500">
+            Ditolak
+          </p>
+
+          <h2 className="mt-2 text-2xl font-bold text-red-600">
+            {jumlahRejected}
           </h2>
         </div>
       </div>
@@ -108,9 +226,19 @@ export default function BookingsPage() {
           </div>
 
           <div className="relative w-full md:w-80">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              🔍
-            </span>
+            <svg
+              className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"
+              />
+            </svg>
 
             <input
               type="text"
@@ -123,149 +251,189 @@ export default function BookingsPage() {
         </div>
       </div>
 
-      {/* TABLE */}
-      <div className="overflow-hidden rounded-xl bg-white shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b bg-gray-50 text-left">
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  No
-                </th>
+      {/* ERROR */}
+      {error && (
+        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+          {error}
+        </div>
+      )}
 
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  Peminjam
-                </th>
+      {/* LOADING */}
+      {loading ? (
+        <div className="rounded-xl bg-white px-6 py-16 text-center shadow-sm">
+          <p className="text-sm text-gray-500">
+            Memuat data booking...
+          </p>
+        </div>
+      ) : (
+        /* TABLE */
+        <div className="overflow-hidden rounded-xl bg-white shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b bg-gray-50 text-left">
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-600">
+                    No
+                  </th>
 
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  Kegiatan
-                </th>
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-600">
+                    Peminjam
+                  </th>
 
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  Gedung
-                </th>
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-600">
+                    Kegiatan
+                  </th>
 
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  Tanggal
-                </th>
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-600">
+                    Gedung
+                  </th>
 
-                <th className="px-6 py-4 text-sm font-semibold text-gray-600">
-                  Status
-                </th>
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-600">
+                    Tanggal
+                  </th>
 
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
-                  Aksi
-                </th>
-              </tr>
-            </thead>
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-600">
+                    Status
+                  </th>
 
-            <tbody>
-              {filteredBookings.length > 0 ? (
-                filteredBookings.map((booking, index) => (
-                  <tr
-                    key={booking.id}
-                    className="border-b last:border-0 hover:bg-gray-50"
-                  >
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {index + 1}
-                    </td>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
+                    Aksi
+                  </th>
+                </tr>
+              </thead>
 
-                    <td className="px-6 py-4">
-                      <p className="font-medium text-gray-800">
-                        {booking.nama}
-                      </p>
+              <tbody>
+                {filteredBookings.length > 0 ? (
+                  filteredBookings.map((booking, index) => (
+                    <tr
+                      key={booking.id}
+                      className="border-b last:border-0 hover:bg-gray-50"
+                    >
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {index + 1}
+                      </td>
 
-                      <p className="text-xs text-gray-400">
-                        {booking.email}
-                      </p>
-                    </td>
+                      <td className="px-6 py-4">
+                        <p className="font-medium text-gray-800">
+                          {booking.nama}
+                        </p>
 
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {booking.kegiatan}
-                    </td>
+                        <p className="text-xs text-gray-400">
+                          {booking.email}
+                        </p>
+                      </td>
 
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {booking.gedung}
-                    </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {booking.kegiatan}
+                      </td>
 
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {booking.tanggal}
-                    </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {booking.gedung}
+                      </td>
 
-                    <td className="px-6 py-4">
-                      <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
-                        {booking.status}
-                      </span>
-                    </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {booking.tanggal}
+                      </td>
 
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap justify-center gap-2">
-                        <button
-                          onClick={() =>
-                            setSelectedBooking(booking)
-                          }
-                          className="rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-100"
+                      <td className="px-6 py-4">
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-medium ${
+                            booking.status === "approved"
+                              ? "bg-green-100 text-green-700"
+                              : booking.status === "rejected"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
                         >
-                          Detail
-                        </button>
+                          {booking.status}
+                        </span>
+                      </td>
 
-                        <button
-                          onClick={() =>
-                            handleApprove(booking)
-                          }
-                          className="rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-600 hover:bg-green-100"
-                        >
-                          Setujui
-                        </button>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSelectedBooking(booking)
+                            }
+                            className="rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-100"
+                          >
+                            Detail
+                          </button>
 
-                        <button
-                          onClick={() =>
-                            handleReject(booking)
-                          }
-                          className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
-                        >
-                          Tolak
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleApprove(booking.id)
+                            }
+                            className="rounded-lg bg-green-50 px-3 py-2 text-sm font-medium text-green-600 hover:bg-green-100"
+                          >
+                            Setujui
+                          </button>
 
-                        <button
-                          onClick={() =>
-                            handleDelete(booking)
-                          }
-                          className="rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200"
-                        >
-                          Hapus
-                        </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleReject(booking.id)
+                            }
+                            className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-100"
+                          >
+                            Tolak
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleDelete(booking.id)
+                            }
+                            className="rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200"
+                          >
+                            Hapus
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="7"
+                      className="px-6 py-16 text-center"
+                    >
+                      <div className="flex flex-col items-center">
+                        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+                          <svg
+                            className="h-8 w-8 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6l5 5v11a2 2 0 0 1-2 2Z"
+                            />
+                          </svg>
+                        </div>
+
+                        <h3 className="font-semibold text-gray-700">
+                          Belum ada pengajuan
+                        </h3>
+
+                        <p className="mt-2 max-w-md text-sm text-gray-400">
+                          Data booking akan muncul setelah
+                          sistem terhubung dengan database.
+                        </p>
                       </div>
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="7"
-                    className="px-6 py-16 text-center"
-                  >
-                    <div className="flex flex-col items-center">
-                      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-3xl">
-                        📋
-                      </div>
-
-                      <h3 className="font-semibold text-gray-700">
-                        Belum ada pengajuan
-                      </h3>
-
-                      <p className="mt-2 max-w-md text-sm text-gray-400">
-                        Data booking akan muncul setelah
-                        sistem terhubung dengan database.
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* MODAL DETAIL */}
       {selectedBooking && (
@@ -284,6 +452,7 @@ export default function BookingsPage() {
               </div>
 
               <button
+                type="button"
                 onClick={() => setSelectedBooking(null)}
                 className="text-xl text-gray-400 hover:text-gray-700"
               >
@@ -369,7 +538,15 @@ export default function BookingsPage() {
                   Status
                 </p>
 
-                <span className="mt-2 inline-block rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
+                <span
+                  className={`mt-2 inline-block rounded-full px-3 py-1 text-xs font-medium ${
+                    selectedBooking.status === "approved"
+                      ? "bg-green-100 text-green-700"
+                      : selectedBooking.status === "rejected"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-yellow-100 text-yellow-700"
+                  }`}
+                >
                   {selectedBooking.status}
                 </span>
               </div>
@@ -378,8 +555,9 @@ export default function BookingsPage() {
             {/* FOOTER */}
             <div className="flex justify-end gap-3 border-t px-6 py-4">
               <button
+                type="button"
                 onClick={() =>
-                  handleReject(selectedBooking)
+                  handleReject(selectedBooking.id)
                 }
                 className="rounded-lg bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-100"
               >
@@ -387,8 +565,9 @@ export default function BookingsPage() {
               </button>
 
               <button
+                type="button"
                 onClick={() =>
-                  handleApprove(selectedBooking)
+                  handleApprove(selectedBooking.id)
                 }
                 className="rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-green-700"
               >
