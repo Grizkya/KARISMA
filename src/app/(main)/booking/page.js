@@ -367,7 +367,7 @@ export default function BookingPage() {
 
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
-                URL Tanda Tangan <span className="text-gray-400 font-normal">(Opsional)</span>
+                Tanda Tangan <span className="text-gray-400 font-normal">(Opsional)</span>
               </label>
               <input
                 type="text"
