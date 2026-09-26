@@ -2,40 +2,95 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 
 export default function BookingPage() {
+  const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minDateStr = tomorrow.toISOString().split("T")[0];
+
   const [formData, setFormData] = useState({
-    user_id: 1,
+    user_id: null,
     venue_id: "",
     event_name: "",
     purpose: "",
-    date: "2026-10-10",
+    date: minDateStr,
     start_time: "09:00:00",
-    end_time: "12:00:00",
+    end_time: "18:00:00",
     participant_count: "",
     admin_note: "",
     signature_url: null,
   });
 
+  useEffect(() => {
+    let token = localStorage.getItem("token");
+    if (!token) {
+      const match = document.cookie.match(/(?:^|; )session_token=([^;]*)/);
+      if (match && match[1] && match[1] !== "undefined" && match[1] !== "null") {
+        token = decodeURIComponent(match[1]);
+        localStorage.setItem("token", token);
+      }
+    }
+
+    if (!token || token === "undefined" || token === "null" || token.trim() === "") {
+      router.replace("/login?redirect=/booking");
+      return;
+    }
+
+    let uid = null;
+    let uName = "";
+
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const u = JSON.parse(storedUser);
+        uid = u.id ?? u.user_id ?? null;
+        uName = u.name || "";
+      } catch (e) {}
+    }
+
+    if (!uid) {
+      const matchProfile = document.cookie.match(/(?:^|; )user_profile=([^;]*)/);
+      if (matchProfile && matchProfile[1]) {
+        try {
+          const u = JSON.parse(decodeURIComponent(matchProfile[1]));
+          uid = u.id ?? u.user_id ?? null;
+          uName = uName || u.name || "";
+        } catch (e) {}
+      }
+    }
+
+    if (!uid && token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        uid = payload.user_id ?? payload.id ?? payload.sub ?? null;
+        uName = uName || payload.name || "";
+      } catch (e) {}
+    }
+
+    if (uid) {
+      setFormData((prev) => ({
+        ...prev,
+        user_id: uid,
+        user_name: uName || prev.user_name || "",
+      }));
+    }
+
+    setIsCheckingAuth(false);
+  }, [router]);
+
   const [venueOptions, setVenueOptions] = useState([]);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showVenueDropdown, setShowVenueDropdown] = useState(false);
-  const [showStartTimeDropdown, setShowStartTimeDropdown] = useState(false);
-  const [showEndTimeDropdown, setShowEndTimeDropdown] = useState(false);
 
   const venueRef = useRef(null);
   const eventNameRef = useRef(null);
   const dateRef = useRef(null);
-  const startRef = useRef(null);
-  const endRef = useRef(null);
-
-  const timeOptions = [
-    "06:00:00", "07:00:00", "08:00:00", "09:00:00", "10:00:00",
-    "11:00:00", "12:00:00", "13:00:00", "14:00:00", "15:00:00", 
-    "16:00:00", "17:00:00", "18:00:00", "19:00:00", "20:00:00", "21:00:00",
-  ];
 
   useEffect(() => {
     async function fetchVenues() {
@@ -55,12 +110,6 @@ export default function BookingPage() {
     function handleClickOutside(event) {
       if (venueRef.current && !venueRef.current.contains(event.target)) {
         setShowVenueDropdown(false);
-      }
-      if (startRef.current && !startRef.current.contains(event.target)) {
-        setShowStartTimeDropdown(false);
-      }
-      if (endRef.current && !endRef.current.contains(event.target)) {
-        setShowEndTimeDropdown(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -82,6 +131,8 @@ export default function BookingPage() {
     e.preventDefault();
     const newErrors = {};
 
+    const todayStr = new Date().toISOString().split("T")[0];
+
     if (!formData.event_name) {
       newErrors.event_name = "Mohon isi Nama Kegiatan terlebih dahulu.";
       eventNameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -91,6 +142,10 @@ export default function BookingPage() {
       venueRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     } else if (!formData.date) {
       newErrors.date = "Mohon pilih Tanggal terlebih dahulu.";
+      dateRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      dateRef.current?.focus();
+    } else if (formData.date <= todayStr) {
+      newErrors.date = "Tidak dapat meminjam untuk hari ini atau tanggal yang sudah lewat.";
       dateRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       dateRef.current?.focus();
     }
@@ -105,13 +160,14 @@ export default function BookingPage() {
 
     try {
       const payload = {
-        user_id: Number(formData.user_id),
+        user_id: formData.user_id ? Number(formData.user_id) : undefined,
+        user_name: formData.user_name || undefined,
         venue_id: Number(formData.venue_id),
         event_name: formData.event_name,
         purpose: formData.purpose || null,
         date: formData.date,
-        start_time: formData.start_time,
-        end_time: formData.end_time,
+        start_time: formData.start_time.length === 5 ? `${formData.start_time}:00` : formData.start_time,
+        end_time: formData.end_time.length === 5 ? `${formData.end_time}:00` : formData.end_time,
         participant_count: formData.participant_count ? Number(formData.participant_count) : null,
         admin_note: formData.admin_note || "",
         signature_url: formData.signature_url || null,
@@ -124,6 +180,7 @@ export default function BookingPage() {
 
       console.log("Response sukses:", result);
       alert("Pengajuan reservasi berhasil!");
+      router.push("/notification");
     } catch (error) {
       console.error("Error API:", error);
       alert(`Terjadi kesalahan: ${error.message}`);
@@ -133,6 +190,14 @@ export default function BookingPage() {
   };
 
   const selectedVenueName = venueOptions.find((v) => v.id === formData.venue_id)?.name || "Pilih Gedung";
+
+  if (isCheckingAuth) {
+    return (
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 text-sm">Memeriksa izin akses...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen py-10 px-6 relative">
@@ -246,62 +311,37 @@ export default function BookingPage() {
                   ref={dateRef}
                   type="date"
                   name="date"
+                  min={minDateStr}
                   value={formData.date}
                   onChange={handleChange}
-                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#133D86] transition"
+                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#133D86] transition [&::-webkit-calendar-picker-indicator]:bg-white [&::-webkit-calendar-picker-indicator]:cursor-pointer"
                 />
               </div>
 
-              <div className="relative" ref={startRef}>
+              <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                   Jam Mulai <span className="text-red-400/60">*</span>
                 </label>
-                <div 
-                  onClick={() => setShowStartTimeDropdown(!showStartTimeDropdown)} 
-                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 flex justify-between items-center cursor-pointer"
-                >
-                  <span>{formData.start_time}</span>
-                  <span className="text-gray-400 text-xs">▼</span>
-                </div>
-                {showStartTimeDropdown && (
-                  <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                    {timeOptions.map((time) => (
-                      <div 
-                        key={time} 
-                        onClick={() => { setFormData({ ...formData, start_time: time }); setShowStartTimeDropdown(false); }} 
-                        className="px-4 py-2 text-xs hover:bg-blue-50 cursor-pointer text-gray-700"
-                      >
-                        {time}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <input
+                  type="time"
+                  name="start_time"
+                  value={formData.start_time.slice(0, 5)}
+                  onChange={handleChange}
+                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#133D86] transition [&::-webkit-calendar-picker-indicator]:bg-white [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                />
               </div>
 
-              <div className="relative" ref={endRef}>
+              <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                   Jam Selesai <span className="text-red-400/60">*</span>
                 </label>
-                <div 
-                  onClick={() => setShowEndTimeDropdown(!showEndTimeDropdown)} 
-                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 flex justify-between items-center cursor-pointer"
-                >
-                  <span>{formData.end_time}</span>
-                  <span className="text-gray-400 text-xs">▼</span>
-                </div>
-                {showEndTimeDropdown && (
-                  <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                    {timeOptions.map((time) => (
-                      <div 
-                        key={time} 
-                        onClick={() => { setFormData({ ...formData, end_time: time }); setShowEndTimeDropdown(false); }} 
-                        className="px-4 py-2 text-xs hover:bg-blue-50 cursor-pointer text-gray-700"
-                      >
-                        {time}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <input
+                  type="time"
+                  name="end_time"
+                  value={formData.end_time.slice(0, 5)}
+                  onChange={handleChange}
+                  className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#133D86] transition [&::-webkit-calendar-picker-indicator]:bg-white [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                />
               </div>
             </div>
 
