@@ -1,85 +1,150 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { getVenues } from '@/lib/api';
 
-// Data terpusat untuk ketiga gedung
-const venuesData = {
-  'arena-budaya': {
-    name: 'Arena Budaya',
-    subtitle: 'Pusat Kegiatan Seni & Seni Budaya UNRAM',
-    capacity: 'Kapasitas: 500+ Orang',
-    image: '/images/arena-budaya.jpg',
-    description:
-      'Arena Budaya Universitas Mataram merupakan tempat pusat kegiatan kebudayaan dan ekspresi seni mahasiswa. Fasilitas ini sering dimanfaatkan untuk acara pementasan seni, kegiatan Open Recruitment (OR) UKM, orientasi organisasi, hingga kegiatan kumpul kebudayaan mahasiswa.',
-  },
-  auditorium: {
-    name: 'Auditorium Yusuf Abu Bakar',
-    subtitle: 'Gedung Utama Universitas Mataram',
-    capacity: 'Kapasitas: 1.000+ Orang',
-    image: '/images/auditorium.jpg',
-    description:
-      'Auditorium Yusuf Abu Bakar adalah gedung pertemuan utama di Universitas Mataram yang diperuntukkan bagi acara-acara formal universitas. Gedung ini menjadi lokasi utama untuk prosesi Wisuda, Yudisium fakultas, Pengukuhan Guru Besar, Seminar Nasional/Internasional, serta Kuliah Umum.',
-  },
-  dom: {
-    name: 'Gedung Dome H. Sunarpi',
-    subtitle: 'Gedung Serbaguna / Olahraga & Expo UNRAM',
-    capacity: 'Kapasitas: 800+ Orang',
-    image: '/images/dom.jpg',
-    description:
-      'Gedung Dome H. Sunarpi merupakan fasilitas serbaguna indoor di Universitas Mataram yang biasa digunakan untuk berbagai kegiatan kemahasiswaan skala besar. Gedung ini ideal untuk pelaksanaan kompetisi olahraga indoor, expo kampus, festival seni, pameran, hingga kegiatan penerimaan mahasiswa baru.',
-  },
+// Mencocokkan slug URL dengan nama gedung di API
+const venueNames = {
+  'arena-budaya': 'Arena Budaya',
+  auditorium: 'Auditorium',
+  dom: 'Dome',
 };
 
 export default async function VenueDetailPage({ params }) {
   const { venue } = await params;
-  const data = venuesData[venue];
 
-  // Jika slug di URL tidak ada di objek data, tampilkan halaman 404
-  if (!data) {
+  // Ambil nama gedung berdasarkan URL
+  const targetName = venueNames[venue];
+
+  if (!targetName) {
+    notFound();
+  }
+
+  // Mengambil data gedung terbaru dari API
+  let listGedung = [];
+
+  try {
+    const res = await getVenues();
+
+    // Menyesuaikan response API:
+    // bisa langsung berupa array atau { data: [...] }
+    listGedung = Array.isArray(res) ? res : res?.data || [];
+  } catch (error) {
+    console.error('Gagal mengambil data gedung:', error);
+    notFound();
+  }
+
+  // Cari gedung berdasarkan nama
+  const gedung = listGedung.find(
+    (item) =>
+      item.name?.toLowerCase() === targetName.toLowerCase()
+  );
+
+  // Kalau gedung tidak ditemukan
+  if (!gedung) {
     notFound();
   }
 
   return (
     <main className="max-w-4xl mx-auto p-6 font-sans">
+
+      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-gray-400 mb-9">
-        <Link href="/" className="hover:text-[#133D86] transition">Beranda</Link>
+        <Link
+          href="/"
+          className="hover:text-[#133D86] transition"
+        >
+          Beranda
+        </Link>
+
         <span>/</span>
-        <span className="text-[#133D86] font-semibold">{data.name}</span>
+
+        <span className="text-[#133D86] font-semibold">
+          {gedung.name}
+        </span>
       </div>
 
+      {/* Card Detail Gedung */}
       <div className="bg-white border rounded-2xl p-6 shadow-sm">
+
+        {/* Gambar dari API */}
         <div className="relative w-full h-80 rounded-xl overflow-hidden mb-6 bg-gray-100">
-          <Image
-            src={data.image}
-            alt={`${data.name} UNRAM`}
-            fill
-            className="object-cover"
-            priority
-          />
+          {gedung.image_url ? (
+            <img
+              src={gedung.image_url}
+              alt={gedung.name || 'Gambar Gedung'}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
+              Tidak ada gambar gedung
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-4 gap-2">
+        {/* Nama + Kapasitas */}
+        <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-6 gap-3">
+
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{data.name}</h1>
-            <p className="text-gray-500 mt-1">{data.subtitle}</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              {gedung.name}
+            </h1>
+
+            {/* Lokasi dari API */}
+            <p className="text-gray-500 mt-2">
+              {gedung.location || 'Lokasi belum tersedia'}
+            </p>
           </div>
+
+          {/* Kapasitas dari API */}
           <span className="bg-blue-100 text-blue-700 text-sm font-semibold px-3 py-1.5 rounded-full w-fit">
-            {data.capacity}
+            Kapasitas: {gedung.capacity || 0}+ Orang
+          </span>
+
+        </div>
+
+        <hr className="my-5 border-gray-200" />
+
+        {/* Status */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-2">
+            Status Gedung
+          </h2>
+
+          <span
+            className={`inline-block px-3 py-1.5 rounded-full text-sm font-semibold ${
+              gedung.status === 'available'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
+            }`}
+          >
+            {gedung.status === 'available'
+              ? 'Tersedia'
+              : gedung.status || 'Status tidak tersedia'}
           </span>
         </div>
 
-        <hr className="my-4 border-gray-200" />
+        {/* Deskripsi */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-2">
+            Penjelasan Gedung
+          </h2>
 
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">
-              Penjelasan Gedung
-            </h2>
-            <p className="text-gray-600 leading-relaxed">
-              {data.description}
-            </p>
-          </div>
+          <p className="text-gray-600 leading-relaxed">
+            {gedung.description || 'Deskripsi gedung belum tersedia.'}
+          </p>
         </div>
+
+        {/* Fasilitas */}
+        <div className="mb-2">
+          <h2 className="text-lg font-semibold text-gray-800 mb-2">
+            Fasilitas
+          </h2>
+
+          <p className="text-gray-600 leading-relaxed">
+            {gedung.facilities || 'Informasi fasilitas belum tersedia.'}
+          </p>
+        </div>
+
       </div>
     </main>
   );
