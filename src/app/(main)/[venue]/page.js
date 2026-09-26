@@ -1,23 +1,10 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getVenues } from '@/lib/api';
 
-// Mencocokkan slug URL dengan nama gedung di API
-const venueNames = {
-  'arena-budaya': 'Arena Budaya',
-  auditorium: 'Auditorium',
-  dom: 'Dome',
-};
-
 export default async function VenueDetailPage({ params }) {
   const { venue } = await params;
-
-  // Ambil nama gedung berdasarkan URL
-  const targetName = venueNames[venue];
-
-  if (!targetName) {
-    notFound();
-  }
 
   // Mengambil data gedung terbaru dari API
   let listGedung = [];
@@ -25,18 +12,20 @@ export default async function VenueDetailPage({ params }) {
   try {
     const res = await getVenues();
 
-    // Menyesuaikan response API:
-    // bisa langsung berupa array atau { data: [...] }
+    // Response API bisa langsung berupa array atau { data: [...] }
     listGedung = Array.isArray(res) ? res : res?.data || [];
   } catch (error) {
     console.error('Gagal mengambil data gedung:', error);
     notFound();
   }
 
-  // Cari gedung berdasarkan nama
+  // Mengubah slug URL menjadi nama yang bisa dibandingkan
+  // Contoh: "arena-budaya" → "arena budaya"
+  const targetName = venue.replace(/-/g, ' ').toLowerCase();
+
+  // Cari gedung berdasarkan nama dari API
   const gedung = listGedung.find(
-    (item) =>
-      item.name?.toLowerCase() === targetName.toLowerCase()
+    (item) => item.name?.toLowerCase() === targetName
   );
 
   // Kalau gedung tidak ditemukan
@@ -66,13 +55,16 @@ export default async function VenueDetailPage({ params }) {
       {/* Card Detail Gedung */}
       <div className="bg-white border rounded-2xl p-6 shadow-sm">
 
-        {/* Gambar dari API */}
+        {/* Gambar dari API (Menggunakan Next.js Image) */}
         <div className="relative w-full h-80 rounded-xl overflow-hidden mb-6 bg-gray-100">
           {gedung.image_url ? (
-            <img
+            <Image
               src={gedung.image_url}
               alt={gedung.name || 'Gambar Gedung'}
-              className="w-full h-full object-cover"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 896px"
+              className="object-cover"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-gray-400">

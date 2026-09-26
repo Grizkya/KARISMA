@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -210,11 +211,10 @@ export default function AdminLayout({ children }) {
       ========================= */}
 
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col bg-[#1D2B42] text-white transition-transform duration-300 md:translate-x-0 ${
-          showMobileMenu
-            ? "translate-x-0"
-            : "-translate-x-full"
-        }`}
+        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col bg-[#1D2B42] text-white transition-transform duration-300 md:translate-x-0 ${showMobileMenu
+          ? "translate-x-0"
+          : "-translate-x-full"
+          }`}
       >
 
         {/* LOGO */}
@@ -262,11 +262,10 @@ export default function AdminLayout({ children }) {
                   key={menu.href}
                   href={menu.href}
                   onClick={closeMobileMenu}
-                  className={`flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-semibold transition ${
-                    isActive
-                      ? "bg-blue-600 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  }`}
+                  className={`flex items-center gap-4 rounded-xl px-4 py-3.5 text-sm font-semibold transition ${isActive
+                    ? "bg-blue-600 text-white"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                    }`}
                 >
                   <span className="flex w-6 justify-center text-base">
                     {menu.icon}
@@ -279,25 +278,6 @@ export default function AdminLayout({ children }) {
 
           </div>
         </nav>
-
-        {/* LOGOUT SIDEBAR */}
-
-        <div className="border-t border-white/10 p-4">
-
-          <button
-            type="button"
-            onClick={() => {
-              setShowLogoutModal(true);
-              setShowMobileMenu(false);
-            }}
-            className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
-          >
-            <span className="text-lg">↪</span>
-            <span>Logout</span>
-          </button>
-
-        </div>
-
       </aside>
 
       {/* =========================
@@ -500,18 +480,18 @@ export default function AdminLayout({ children }) {
                           );
                         }).length === 0 && (
 
-                          <div className="px-3 py-4 text-center">
+                            <div className="px-3 py-4 text-center">
 
-                            <p className="text-sm font-medium text-gray-700">
-                              Tidak ditemukan
-                            </p>
+                              <p className="text-sm font-medium text-gray-700">
+                                Tidak ditemukan
+                              </p>
 
-                            <p className="mt-1 text-xs text-gray-400">
-                              Coba gunakan kata kunci lain.
-                            </p>
+                              <p className="mt-1 text-xs text-gray-400">
+                                Coba gunakan kata kunci lain.
+                              </p>
 
-                          </div>
-                        )}
+                            </div>
+                          )}
 
                       </div>
                     )}
@@ -809,9 +789,9 @@ export default function AdminLayout({ children }) {
               </button>
 
               {showProfile && (
-                <div className="absolute right-0 top-14 w-64 max-w-[calc(100vw-2rem)] rounded-xl bg-white p-2 shadow-xl">
+                <div className="absolute right-0 top-14 w-64 max-w-[calc(100vw-2rem)] rounded-xl bg-white p-2 shadow-xl border border-gray-100">
 
-                  <div className="px-3 py-3">
+                  <div className="border-b border-gray-100 px-3 py-3">
 
                     <p className="text-sm font-semibold text-gray-800">
                       Administrator
@@ -821,6 +801,31 @@ export default function AdminLayout({ children }) {
                       Admin RaVenue
                     </p>
 
+                  </div>
+
+                  <div className="p-1 space-y-1">
+                    <Link
+                      href="/"
+                      onClick={() => setShowProfile(false)}
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition"
+                    >
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      <span>Dashboard User</span>
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowProfile(false);
+                        setShowLogoutModal(true);
+                      }}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition"
+                    >
+                      <span className="text-base">↪</span>
+                      <span>Logout</span>
+                    </button>
                   </div>
 
                 </div>

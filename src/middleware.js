@@ -17,7 +17,6 @@ export function middleware(request) {
   const isProtected =
     pathname.startsWith("/booking") ||
     pathname.startsWith("/notification") ||
-    pathname.startsWith("/profile") ||
     pathname.startsWith("/admin");
 
   // Jika belum login / token tidak valid dan mencoba mengakses rute terproteksi
@@ -49,8 +48,6 @@ export const config = {
     "/booking/:path*",
     "/notification",
     "/notification/:path*",
-    "/profile",
-    "/profile/:path*",
     "/admin",
     "/admin/:path*",
   ],

@@ -1,15 +1,57 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { logoutAction } from "@/lib/auth";
+
+function getUserStorageKey(userObj) {
+  if (!userObj) return "default_user";
+  const id = userObj.id ?? userObj.user_id;
+  if (id) return `id_${id}`;
+  if (userObj.email) {
+    return `email_${String(userObj.email).toLowerCase().trim().replace(/[^a-z0-9]/g, "_")}`;
+  }
+  if (userObj.name) {
+    return `name_${String(userObj.name).toLowerCase().trim().replace(/[^a-z0-9]/g, "_")}`;
+  }
+  return "default_user";
+}
+
+function checkIsNotificationRead(userKey) {
+  if (typeof window === "undefined" || !userKey) return false;
+  try {
+    if (localStorage.getItem(`notif_read_${userKey}`) === "true") return true;
+    const cookieMatch = document.cookie.match(new RegExp(`(?:^|; )notif_read_${userKey}=([^;]+)`));
+    if (cookieMatch && cookieMatch[1] === "true") return true;
+  } catch (e) {}
+  return false;
+}
+
+function markNotificationAsRead(userKey) {
+  if (typeof window === "undefined" || !userKey) return;
+  try {
+    localStorage.setItem(`notif_read_${userKey}`, "true");
+    document.cookie = `notif_read_${userKey}=true; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+    window.dispatchEvent(new Event("notifications_read"));
+  } catch (e) {
+    console.error("Error saving notif read status", e);
+  }
+}
 
 export default function Header() {
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("user");
   const [username, setUsername] = useState("Pengguna");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [hasUnreadNotification, setHasUnreadNotification] = useState(true);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [hasUnreadNotification, setHasUnreadNotification] = useState(false);
+  const [currentUserKey, setCurrentUserKey] = useState(null);
+  const userDropdownRef = useRef(null);
 
   useEffect(() => {
     let token = localStorage.getItem("token");
@@ -23,22 +65,106 @@ export default function Header() {
     const storedUser = localStorage.getItem("user");
     if (token) {
       setIsLoggedIn(true);
+      let userObj = null;
       if (storedUser) {
         try {
-          const userObj = JSON.parse(storedUser);
-          setUsername(userObj.name || userObj.email || "Pengguna");
-          setRole((userObj.role || "user").toLowerCase());
+          userObj = JSON.parse(storedUser);
         } catch (e) {
           console.error("Error reading user data", e);
         }
       }
+      if (!userObj) {
+        const profileMatch = document.cookie.match(new RegExp('(?:^|; )user_profile=([^;]+)'));
+        if (profileMatch && profileMatch[1]) {
+          try {
+            userObj = JSON.parse(decodeURIComponent(profileMatch[1]));
+          } catch (e) {}
+        }
+      }
+      if (userObj) {
+        setUsername(userObj.name || userObj.username || userObj.email || "Pengguna");
+        setEmail(userObj.email || "-");
+        setPhone(userObj.phone || userObj.no_hp || userObj.no_telp || userObj.telepon || "-");
+        setRole((userObj.role || "user").toLowerCase());
+
+        const uKey = getUserStorageKey(userObj);
+        setCurrentUserKey(uKey);
+        const isRead = checkIsNotificationRead(uKey);
+        setHasUnreadNotification(!isRead);
+      } else {
+        const fallbackKey = "default_user";
+        setCurrentUserKey(fallbackKey);
+        const isRead = checkIsNotificationRead(fallbackKey);
+        setHasUnreadNotification(!isRead);
+      }
     } else {
       setIsLoggedIn(false);
+      setHasUnreadNotification(false);
     }
+  }, []);
+
+  // Sinkronisasi status notifikasi jika dibaca di halaman /notification atau tab lain
+  useEffect(() => {
+    const handleReadEvent = () => {
+      setHasUnreadNotification(false);
+    };
+    window.addEventListener("notifications_read", handleReadEvent);
+    window.addEventListener("storage", handleReadEvent);
+    return () => {
+      window.removeEventListener("notifications_read", handleReadEvent);
+      window.removeEventListener("storage", handleReadEvent);
+    };
+  }, []);
+
+  // Tutup dropdown saat klik di luar elemen dropdown atau tekan Escape
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setIsUserDropdownOpen(false);
+      }
+    };
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsUserDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const handleNotificationClick = () => {
     setHasUnreadNotification(false);
+    let key = currentUserKey;
+    if (!key && typeof window !== "undefined") {
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        try {
+          key = getUserStorageKey(JSON.parse(stored));
+        } catch (e) {}
+      }
+    }
+    if (!key) key = "default_user";
+    markNotificationAsRead(key);
+  };
+
+  const handleLogout = async () => {
+    setIsUserDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      document.cookie = "session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "user_role=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "user_profile=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      await logoutAction();
+    } catch {
+      router.push("/login");
+      router.refresh();
+    }
   };
 
   // Ambil huruf pertama username untuk Avatar Lingkaran
@@ -114,20 +240,83 @@ export default function Header() {
                 </Link>
               </div>
 
-              {/* PROFILE AKUN AVATAR LINGKARAN */}
-              <Link 
-                href="/profile" 
-                className="flex items-center gap-2 p-1 pr-2.5 rounded-full hover:bg-white/10 transition-all duration-200 group"
-              >
-                {/* Lingkaran Inisial Nama */}
-                <div className="w-8 h-8 rounded-full bg-[#D18408] text-[#091F44] font-bold flex items-center justify-center text-sm shadow-md group-hover:bg-[#A56806] group-hover:text-white transition-colors">
-                  {getInitial(username)}
-                </div>
+              {/* PROFILE AKUN AVATAR & DROPDOWN MENU */}
+              <div className="relative" ref={userDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                  aria-expanded={isUserDropdownOpen}
+                  aria-haspopup="true"
+                  className="flex items-center gap-2 p-1 pr-2 rounded-full hover:bg-white/10 transition-all duration-200 group focus:outline-none focus:ring-2 focus:ring-[#D18408]/50 cursor-pointer"
+                >
+                  {/* Lingkaran Inisial Nama */}
+                  <div className="w-8 h-8 rounded-full bg-[#D18408] text-[#091F44] font-bold flex items-center justify-center text-sm shadow-md group-hover:bg-[#e09214] transition-colors shrink-0">
+                    {getInitial(username)}
+                  </div>
 
-                <span className="hidden sm:inline text-[0.95em] font-medium text-[#eee] group-hover:text-[#D18408] transition-colors max-w-30 truncate">
-                  {username}
-                </span>
-              </Link>
+                  <span className="hidden sm:inline text-[0.95em] font-medium text-[#eee] group-hover:text-[#D18408] transition-colors max-w-32 truncate text-left">
+                    {username}
+                  </span>
+
+                  {/* Icon Chevron Arrow */}
+                  <svg 
+                    className={`w-4 h-4 text-gray-300 transition-transform duration-200 ${isUserDropdownOpen ? "rotate-180 text-[#D18408]" : "group-hover:text-[#D18408]"}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* DROPDOWN POPUP MENU */}
+                {isUserDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-[#132746] border border-[#2a4878] rounded-xl shadow-2xl p-3 z-50 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-150">
+                    {/* Data Akun: Email & No. Telp */}
+                    <div className="space-y-2.5 pb-3 border-b border-[#2a4878]/70">
+                      {/* Email */}
+                      <div className="flex items-start gap-2.5 text-xs text-gray-300">
+                        <svg className="w-4 h-4 text-[#D18408] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider">Email</p>
+                          <p className="text-sm font-medium text-white truncate" title={email}>
+                            {email || "-"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Nomor Telepon */}
+                      <div className="flex items-start gap-2.5 text-xs text-gray-300">
+                        <svg className="w-4 h-4 text-[#D18408] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider">Nomor Telepon</p>
+                          <p className="text-sm font-medium text-white truncate" title={phone}>
+                            {phone || "-"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Tombol Logout */}
+                    <div className="pt-2">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-red-400 hover:text-white hover:bg-red-600/80 rounded-lg transition-colors font-medium cursor-pointer"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
 
             </div>
           ) : (
@@ -188,6 +377,20 @@ export default function Header() {
               className="block px-3 py-2 rounded-md text-base font-medium text-[#eee] hover:bg-[#2a4878] hover:text-[#D18408] transition-colors">
               Management
             </Link>
+          )}
+          {isLoggedIn && (
+            <div className="pt-2 border-t border-[#2a4878]">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium text-red-400 hover:bg-red-500/15 hover:text-red-300 transition-colors text-left cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
+            </div>
           )}
         </div>
       )}

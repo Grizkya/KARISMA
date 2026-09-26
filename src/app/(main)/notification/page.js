@@ -77,6 +77,26 @@ export default function NotificationPage() {
         }
 
         // ==============================
+        // 2.1 TANDAI NOTIFIKASI SUDAH DIBACA (disimpan permanen di localStorage & cookie)
+        // ==============================
+        let notifUserKey = "default_user";
+        if (currentUserId) {
+          notifUserKey = `id_${currentUserId}`;
+        } else if (currentUserEmail) {
+          notifUserKey = `email_${String(currentUserEmail).toLowerCase().trim().replace(/[^a-z0-9]/g, "_")}`;
+        } else if (currentUserName) {
+          notifUserKey = `name_${String(currentUserName).toLowerCase().trim().replace(/[^a-z0-9]/g, "_")}`;
+        }
+
+        try {
+          localStorage.setItem(`notif_read_${notifUserKey}`, "true");
+          document.cookie = `notif_read_${notifUserKey}=true; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+          window.dispatchEvent(new Event("notifications_read"));
+        } catch (e) {
+          console.error("Error setting notification as read", e);
+        }
+
+        // ==============================
         // 3. FETCH DATA BOOKING DARI API
         // ==============================
         const result = await apiFetch("/bookings");
