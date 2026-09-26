@@ -46,7 +46,6 @@ export default function Header() {
   const [role, setRole] = useState("user");
   const [username, setUsername] = useState("Pengguna");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [hasUnreadNotification, setHasUnreadNotification] = useState(false);
@@ -84,7 +83,6 @@ export default function Header() {
       if (userObj) {
         setUsername(userObj.name || userObj.username || userObj.email || "Pengguna");
         setEmail(userObj.email || "-");
-        setPhone(userObj.phone || userObj.no_hp || userObj.no_telp || userObj.telepon || "-");
         setRole((userObj.role || "user").toLowerCase());
 
         const uKey = getUserStorageKey(userObj);
@@ -271,10 +269,9 @@ export default function Header() {
 
                 {/* DROPDOWN POPUP MENU */}
                 {isUserDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-[#132746] border border-[#2a4878] rounded-xl shadow-2xl p-3 z-50 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-150">
-                    {/* Data Akun: Email & No. Telp */}
-                    <div className="space-y-2.5 pb-3 border-b border-[#2a4878]/70">
-                      {/* Email */}
+                  <div className="absolute right-0 mt-2 w-56 bg-[#132746] border border-[#2a4878] rounded-xl shadow-2xl p-3 z-50 backdrop-blur-md animate-in fade-in slide-in-from-top-2 duration-150">
+                    {/* Data Akun: Hanya Email */}
+                    <div className="pb-3 border-b border-[#2a4878]/70">
                       <div className="flex items-start gap-2.5 text-xs text-gray-300">
                         <svg className="w-4 h-4 text-[#D18408] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -283,19 +280,6 @@ export default function Header() {
                           <p className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider">Email</p>
                           <p className="text-sm font-medium text-white truncate" title={email}>
                             {email || "-"}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Nomor Telepon */}
-                      <div className="flex items-start gap-2.5 text-xs text-gray-300">
-                        <svg className="w-4 h-4 text-[#D18408] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[10px] uppercase font-semibold text-gray-400 tracking-wider">Nomor Telepon</p>
-                          <p className="text-sm font-medium text-white truncate" title={phone}>
-                            {phone || "-"}
                           </p>
                         </div>
                       </div>
