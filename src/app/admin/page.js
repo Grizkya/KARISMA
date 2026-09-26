@@ -95,9 +95,7 @@ export default function AdminDashboard() {
               </p>
             </div>
 
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-2xl">
-              👥
-            </div>
+          
           </div>
         </div>
 
@@ -118,9 +116,7 @@ export default function AdminDashboard() {
               </p>
             </div>
 
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-2xl">
-              📋
-            </div>
+          
           </div>
         </div>
 
@@ -141,9 +137,7 @@ export default function AdminDashboard() {
               </p>
             </div>
 
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-2xl">
-              🏢
-            </div>
+            
           </div>
         </div>
       </div>
@@ -197,7 +191,7 @@ export default function AdminDashboard() {
           {/* DITOLAK */}
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-xl">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-200 text-xl">
                 ✕
               </div>
 

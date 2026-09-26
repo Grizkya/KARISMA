@@ -310,7 +310,7 @@ export default function AdminLayout({ children }) {
             HEADER
         ========================= */}
 
-        <header className="sticky top-0 z-30 flex min-h-20 items-center justify-between bg-[#133D86] px-4 py-3 shadow-sm sm:px-6 md:px-8">
+        <header className="sticky top-0 z-30 flex min-h-20 items-center justify-between bg-[#1D2B42] px-4 py-3 shadow-sm sm:px-6 md:px-8">
 
           {/* LEFT HEADER */}
 

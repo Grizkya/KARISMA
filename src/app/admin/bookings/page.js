@@ -184,7 +184,7 @@ export default function BookingsPage() {
             Menunggu Persetujuan
           </p>
 
-          <h2 className="mt-2 text-2xl font-bold text-yellow-600">
+          <h2 className="mt-2 text-2xl font-bold text-gray-800">
             {jumlahPending}
           </h2>
         </div>
@@ -195,7 +195,7 @@ export default function BookingsPage() {
             Disetujui
           </p>
 
-          <h2 className="mt-2 text-2xl font-bold text-green-600">
+          <h2 className="mt-2 text-2xl font-bold text-gray-800">
             {jumlahApproved}
           </h2>
         </div>
@@ -206,7 +206,7 @@ export default function BookingsPage() {
             Ditolak
           </p>
 
-          <h2 className="mt-2 text-2xl font-bold text-red-600">
+          <h2 className="mt-2 text-2xl font-bold text-gray-800">
             {jumlahRejected}
           </h2>
         </div>
@@ -356,7 +356,7 @@ export default function BookingsPage() {
                             onClick={() =>
                               setSelectedBooking(booking)
                             }
-                            className="rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-100"
+                            className="rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200"
                           >
                             Detail
                           </button>
@@ -386,7 +386,7 @@ export default function BookingsPage() {
                             onClick={() =>
                               handleDelete(booking.id)
                             }
-                            className="rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200"
+                            className="rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200"
                           >
                             Hapus
                           </button>
