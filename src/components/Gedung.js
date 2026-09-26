@@ -107,10 +107,10 @@ async function ListGedung() {
   );
 }
 
-export default function Home() {
+export default function Gedung() {
   return (
-    <main className="min-h-screen bg-slate-50">
+    <div className="bg-slate-50">
       <ListGedung />
-    </main>
+    </div>
   );
 }

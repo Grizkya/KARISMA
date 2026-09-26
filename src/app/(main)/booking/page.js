@@ -2,11 +2,15 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 
 export default function BookingPage() {
+  const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   const [formData, setFormData] = useState({
-    user_id: 1,
+    user_id: null,
     venue_id: "",
     event_name: "",
     purpose: "",
@@ -17,6 +21,65 @@ export default function BookingPage() {
     admin_note: "",
     signature_url: null,
   });
+
+  // Client-side Auth Guard
+  useEffect(() => {
+    let token = localStorage.getItem("token");
+    if (!token) {
+      const match = document.cookie.match(/(?:^|; )session_token=([^;]*)/);
+      if (match && match[1] && match[1] !== "undefined" && match[1] !== "null") {
+        token = decodeURIComponent(match[1]);
+        localStorage.setItem("token", token);
+      }
+    }
+
+    if (!token || token === "undefined" || token === "null" || token.trim() === "") {
+      router.replace("/login?redirect=/booking");
+      return;
+    }
+
+    // Ambil data user yang sedang login (ID, Nama, Email)
+    let uid = null;
+    let uName = "";
+
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const u = JSON.parse(storedUser);
+        uid = u.id ?? u.user_id ?? null;
+        uName = u.name || "";
+      } catch (e) {}
+    }
+
+    if (!uid) {
+      const matchProfile = document.cookie.match(/(?:^|; )user_profile=([^;]*)/);
+      if (matchProfile && matchProfile[1]) {
+        try {
+          const u = JSON.parse(decodeURIComponent(matchProfile[1]));
+          uid = u.id ?? u.user_id ?? null;
+          uName = uName || u.name || "";
+        } catch (e) {}
+      }
+    }
+
+    if (!uid && token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        uid = payload.user_id ?? payload.id ?? payload.sub ?? null;
+        uName = uName || payload.name || "";
+      } catch (e) {}
+    }
+
+    if (uid) {
+      setFormData((prev) => ({
+        ...prev,
+        user_id: uid,
+        user_name: uName || prev.user_name || "",
+      }));
+    }
+
+    setIsCheckingAuth(false);
+  }, [router]);
 
   const [venueOptions, setVenueOptions] = useState([]);
   const [errors, setErrors] = useState({});
@@ -105,7 +168,8 @@ export default function BookingPage() {
 
     try {
       const payload = {
-        user_id: Number(formData.user_id),
+        user_id: formData.user_id ? Number(formData.user_id) : undefined,
+        user_name: formData.user_name || undefined,
         venue_id: Number(formData.venue_id),
         event_name: formData.event_name,
         purpose: formData.purpose || null,
@@ -124,6 +188,7 @@ export default function BookingPage() {
 
       console.log("Response sukses:", result);
       alert("Pengajuan reservasi berhasil!");
+      router.push("/notification");
     } catch (error) {
       console.error("Error API:", error);
       alert(`Terjadi kesalahan: ${error.message}`);
@@ -133,6 +198,14 @@ export default function BookingPage() {
   };
 
   const selectedVenueName = venueOptions.find((v) => v.id === formData.venue_id)?.name || "Pilih Gedung";
+
+  if (isCheckingAuth) {
+    return (
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center">
+        <p className="text-gray-500 text-sm">Memeriksa izin akses...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-50 min-h-screen py-10 px-6 relative">

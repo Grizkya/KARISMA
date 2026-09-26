@@ -197,7 +197,7 @@ function Calendar() {
               <div className="text-xs text-gray-500 mt-1 font-normal">Siap Dipinjam</div>
             </div>
             <div className="bg-slate-50 py-5 px-2 rounded-xl border border-gray-100 text-center flex flex-col items-center justify-center overflow-hidden">
-              <div className="text-2xl font-bold text-[#F4B042] whitespace-nowrap">
+              <div className="text-2xl font-bold text-[#133D86] whitespace-nowrap">
                 Terintegrasi
               </div>
               <div className="text-xs text-gray-500 mt-1 font-normal">
@@ -240,15 +240,4 @@ function Calendar() {
   );
 } 
 
-export default function Home() {
-  return (
-    <div className="min-h-screen bg-gray-50 font-sans antialiased">
-      <div className="text-center">
-      </div>
-      
-      <div className="px-4">
-        <Calendar />
-      </div>
-    </div>
-  );
-}
+export default Calendar;

@@ -41,12 +41,11 @@ export default async function VenueDetailPage({ params }) {
 
   return (
     <main className="max-w-4xl mx-auto p-6 font-sans">
-      <Link
-        href="/"
-        className="text-blue-600 font-medium hover:underline inline-block mb-4"
-      >
-        &larr; Kembali ke Daftar Gedung
-      </Link>
+      <div className="flex items-center gap-2 text-xs text-gray-400 mb-9">
+        <Link href="/" className="hover:text-[#133D86] transition">Beranda</Link>
+        <span>/</span>
+        <span className="text-[#133D86] font-semibold">{data.name}</span>
+      </div>
 
       <div className="bg-white border rounded-2xl p-6 shadow-sm">
         <div className="relative w-full h-80 rounded-xl overflow-hidden mb-6 bg-gray-100">

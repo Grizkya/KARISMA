@@ -73,6 +73,12 @@ export default function Profile() {
   // Simpan Update Profil ke API
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (userData.password && userData.password.length < 8) {
+      alert("Password minimal harus 8 karakter.");
+      return;
+    }
+
     setLoading(true);
     const token = localStorage.getItem("token");
 
@@ -202,6 +208,8 @@ export default function Profile() {
                   onChange={handleChange}
                   disabled={!isEditing}
                   required
+                  minLength={8}
+                  placeholder={isEditing ? "Minimal 8 karakter" : ""}
                   className={`w-full px-4 py-2.5 pr-10 border rounded-lg text-sm transition-all ${
                     isEditing 
                       ? "border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#133D86] bg-white text-gray-900" 
@@ -220,6 +228,11 @@ export default function Profile() {
                   )}
                 </button>
               </div>
+              {isEditing && (
+                <p className="text-xs text-gray-500 mt-1">
+                  * Minimal 8 karakter
+                </p>
+              )}
             </div>
 
             <div className="flex gap-3 mt-3">

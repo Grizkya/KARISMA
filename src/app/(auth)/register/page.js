@@ -26,8 +26,14 @@ export default function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMsg("");
+
+    if (formData.password.length < 8) {
+      setErrorMsg("Password minimal harus 8 karakter.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       await apiFetch("/register", {
@@ -120,8 +126,9 @@ export default function Register() {
               <input 
                 type={showPassword ? "text" : "password"} 
                 name="password"
-                placeholder="Password" 
+                placeholder="Password (minimal 8 karakter)" 
                 required
+                minLength={8}
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#133D86] text-sm"
