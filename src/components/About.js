@@ -9,7 +9,7 @@ function About() {
           
           {/* SISI KIRI: Deskripsi Utama */}
           <div className="flex-1 text-left space-y-4">
-            <div className="inline-block px-3 py-1 bg-blue-50 text-[#133D86] text-xs font-semibold rounded-full uppercase tracking-wider">
+            <div className="inline-block px-3 py-1 bg-[#fcefdb8a] text-[#F4B042] text-xs font-semibold rounded-full uppercase tracking-wider">
               Profil Platform
             </div>
             
